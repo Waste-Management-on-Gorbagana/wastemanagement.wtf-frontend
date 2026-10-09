@@ -39,10 +39,17 @@ export default class Level extends Phaser.Scene {
 create() {
 	this.editorCreate();
 
-console.log("WM flicker code is running");
-
 	const onKey = "wm-wallet-button";
 	const offKey = "wm-wallet-button-off";
+
+	this.input.once("pointerdown", () => {
+
+    this.sound.play("build_your_empire_of_trash", {
+        loop: true,
+        volume: 0.5
+    });
+
+});
 
 	const button = this.children.list.find(
 		(obj): obj is Phaser.GameObjects.Image =>
