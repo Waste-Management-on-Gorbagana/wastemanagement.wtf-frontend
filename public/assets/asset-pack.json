@@ -1,6 +1,13 @@
 {
     "section1": {
         "files": [
+                 {
+                "url": [
+                    "assets/audio/Build Your Empire of Trash.mp3"
+                ],
+                "type": "audio",
+                "key": "build_your_empire_of_trash"
+            },
             {
                 "url": "assets/FufuSuperDino.png",
                 "type": "image",
