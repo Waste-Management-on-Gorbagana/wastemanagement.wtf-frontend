@@ -26,15 +26,41 @@
         },
         {
             "type": "Image",
-            "id": "926a8a3a-6a8f-449a-859c-cdbdeeb3832e",
-            "label": "wm_wallet_button",
+            "id": "9c911324-5d64-4495-817f-70c8f6ccd8d3",
+            "label": "wm_connect_wallet_button0",
             "texture": {
-                "key": "wm-wallet-button"
+                "key": "wm-connect-wallet-button",
+                "frame": 0
             },
             "x": 640,
-            "y": 650,
-            "scaleX": 0.14,
-            "scaleY": 0.14
+            "y": 640,
+            "scaleX": 0.2,
+            "scaleY": 0.2
+        },
+        {
+            "type": "Image",
+            "id": "4ec59f3d-998d-49e2-9275-d9709d3eb209",
+            "label": "wm_powered_by_gorbagana0",
+            "texture": {
+                "key": "wm-powered-by-gorbagana",
+                "frame": 0
+            },
+            "x": 1173,
+            "y": 42,
+            "scaleX": 0.15,
+            "scaleY": 0.15
+        },
+        {
+            "type": "Image",
+            "id": "eb65835f-17e6-4f38-91db-06f8f9f903c5",
+            "label": "wm_wigbeek_button",
+            "texture": {
+                "key": "wm-wigbeek-button"
+            },
+            "x": 34,
+            "y": 34,
+            "scaleX": 0.05,
+            "scaleY": 0.05
         }
     ],
     "plainObjects": [],

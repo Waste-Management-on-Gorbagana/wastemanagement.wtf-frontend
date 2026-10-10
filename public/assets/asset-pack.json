@@ -1,13 +1,6 @@
 {
     "section1": {
         "files": [
-                 {
-                "url": [
-                    "assets/audio/build_your_empire_of_trash.mp3"
-                ],
-                "type": "audio",
-                "key": "build_your_empire_of_trash"
-            },
             {
                 "url": "assets/FufuSuperDino.png",
                 "type": "image",
@@ -19,9 +12,29 @@
                 "key": "wm-close-button"
             },
             {
+                "url": "assets/wm-connect-wallet-button.png",
+                "frameConfig": {
+                    "frameWidth": 1280,
+                    "frameHeight": 448,
+                    "startFrame": 0,
+                    "endFrame": 1,
+                    "spacing": 0,
+                    "margin": 0
+                },
+                "type": "spritesheet",
+                "key": "wm-connect-wallet-button"
+            },
+            {
                 "url": "assets/wm-login-background.png.png",
                 "type": "image",
                 "key": "wm-login-background.png"
+            },
+            {
+                "url": [
+                    "assets/wm-login-intro.mp4"
+                ],
+                "type": "video",
+                "key": "wm-login-intro"
             },
             {
                 "url": "assets/wm-modal-panel.png",
@@ -29,14 +42,22 @@
                 "key": "wm-modal-panel"
             },
             {
-                "url": "assets/wm-wallet-button.png",
-                "type": "image",
-                "key": "wm-wallet-button"
+                "url": "assets/wm-powered-by-gorbagana.png",
+                "frameConfig": {
+                    "frameWidth": 1280,
+                    "frameHeight": 448,
+                    "startFrame": 0,
+                    "endFrame": 1,
+                    "spacing": 0,
+                    "margin": 0
+                },
+                "type": "spritesheet",
+                "key": "wm-powered-by-gorbagana"
             },
             {
-                "url": "assets/wm-wallet-button-off.png",
+                "url": "assets/wm-wigbeek-button.png",
                 "type": "image",
-                "key": "wm-wallet-button-off"
+                "key": "wm-wigbeek-button"
             }
         ]
     },

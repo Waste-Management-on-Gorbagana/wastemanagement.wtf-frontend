@@ -24,118 +24,187 @@ export default class Level extends Phaser.Scene {
 		wm_login_background_png.scaleX = 0.766;
 		wm_login_background_png.scaleY = 0.766;
 
-		// wm_wallet_button
-		const wm_wallet_button = this.add.image(640, 650, "wm-wallet-button");
-		wm_wallet_button.scaleX = 0.14;
-		wm_wallet_button.scaleY = 0.14;
+		// wm_connect_wallet_button0
+		const wm_connect_wallet_button0 = this.add.image(640, 640, "wm-connect-wallet-button", 0);
+		wm_connect_wallet_button0.scaleX = 0.2;
+		wm_connect_wallet_button0.scaleY = 0.2;
+
+		// wm_powered_by_gorbagana0
+		const wm_powered_by_gorbagana0 = this.add.image(1173, 42, "wm-powered-by-gorbagana", 0);
+		wm_powered_by_gorbagana0.scaleX = 0.15;
+		wm_powered_by_gorbagana0.scaleY = 0.15;
+
+		// wm_wigbeek_button
+		const wm_wigbeek_button = this.add.image(34, 34, "wm-wigbeek-button");
+		wm_wigbeek_button.scaleX = 0.05;
+		wm_wigbeek_button.scaleY = 0.05;
 
 		this.events.emit("scene-awake");
 	}
 
 	/* START-USER-CODE */
 
-	// Write your code here
+	private introPlaying = false;
 
-create() {
-	this.editorCreate();
+	create(): void {
+		this.editorCreate();
+		this.introPlaying = false;
+		this.input.setTopOnly(true);
+		// The video contains the music. Remove the old click-anywhere soundtrack.
+		this.sound.stopByKey("build_your_empire_of_trash");
 
-	const onKey = "wm-wallet-button";
-	const offKey = "wm-wallet-button-off";
-
-	this.input.once("pointerdown", () => {
-
-    this.sound.play("build_your_empire_of_trash", {
-        loop: true,
-        volume: 0.5
-    });
-
-});
-
-	const button = this.children.list.find(
-		(obj): obj is Phaser.GameObjects.Image =>
-			obj instanceof Phaser.GameObjects.Image &&
-			obj.texture.key === onKey
-	);
-
-	if (!button || !this.textures.exists(offKey)) {
-		console.warn("Check the wallet button texture keys in asset-pack.json.");
-		return;
+		this.bindSheetButton("wm-connect-wallet-button", () => this.showComingSoon());
+		this.bindSheetButton("wm-powered-by-gorbagana", () => {
+			window.open("https://www.gorbagana.wtf", "_blank", "noopener,noreferrer");
+		});
+		this.setupWigbeekButton();
 	}
 
-	const width = button.displayWidth;
-	const height = button.displayHeight;
-	let hovered = false;
+	// Sheets use frames 0/1; WIGBEEK uses one face image.
+	// Position, origin and normal scale stay controlled by Level.scene.
+	private bindSheetButton(
+		key: string,
+		onClick: () => void,
+		isActive: () => boolean = () => false,
+		singleImage = false
+	): { refresh: () => void; cancel: () => void } | undefined {
+		const button = this.children.list.find(
+			(object): object is Phaser.GameObjects.Image =>
+				object instanceof Phaser.GameObjects.Image && object.texture.key === key
+		);
+		if (!button || (!singleImage && (!button.texture.has("0") || !button.texture.has("1")))) {
+			console.warn(`Check ${key} in Level.scene and asset-pack.json. WIGBEEK needs an Image; other buttons need frames 0 and 1.`);
+			return;
+		}
 
-	const setLight = (lit: boolean) => {
-		button.setTexture(lit ? onKey : offKey);
-		button.setDisplaySize(width, height);
-	};
+		button.setDepth(20);
+		if (singleImage) button.setTexture(key);
+		else button.setFrame(0);
+		const normalX = button.scaleX;
+		const normalY = button.scaleY;
+		let hovered = false;
+		let pressedPointer: number | null = null;
+		const blocked = () => !!this.children.getByName("comingSoonModal");
+		const refresh = () => {
+			if (!singleImage) {
+				button.setFrame(isActive() || (!blocked() && (hovered || pressedPointer !== null)) ? 1 : 0);
+			}
+		};
+		const animate = (down: boolean) => {
+			this.tweens.killTweensOf(button);
+			const size = down ? 0.95 : (singleImage && hovered && !blocked() ? 1.06 : 1);
+			this.tweens.add({
+				targets: button,
+				scaleX: normalX * size,
+				scaleY: normalY * size,
+				duration: down ? 70 : 170,
+				ease: down ? "Quad.Out" : "Back.Out"
+			});
+		};
+		const cancel = () => {
+			hovered = false;
+			pressedPointer = null;
+			refresh();
+			animate(false);
+		};
 
-	// Limit the mouse area to the sign, excluding transparent padding.
-	button.setInteractive({
-		hitArea: new Phaser.Geom.Rectangle(
-			button.width * 0.02,
-			button.height * 0.17,
-			button.width * 0.96,
-			button.height * 0.61
-		),
-		hitAreaCallback: Phaser.Geom.Rectangle.Contains,
-		useHandCursor: true
-	});
+		// Use a stable rectangular target, including transparent padding for touch.
+		button.setInteractive({ useHandCursor: true });
+		button.on("pointerover", (pointer: Phaser.Input.Pointer) => {
+			hovered = !pointer.wasTouch;
+			refresh();
+			if (singleImage) animate(pressedPointer !== null);
+		});
+		button.on("pointerout", cancel);
+		button.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
+			if (blocked() || isActive() || pressedPointer !== null) return;
+			pressedPointer = pointer.id;
+			refresh();
+			animate(true);
+		});
+		button.on("pointerup", (pointer: Phaser.Input.Pointer) => {
+			if (pressedPointer !== pointer.id) return;
+			pressedPointer = null;
+			hovered = !pointer.wasTouch;
+			animate(false);
+			if (!blocked() && !isActive()) onClick();
+			refresh();
+		});
+		const releaseOutside = (pointer: Phaser.Input.Pointer) => {
+			if (pressedPointer === pointer.id) cancel();
+		};
+		this.input.on("pointerup", releaseOutside);
+		this.input.on("pointerupoutside", releaseOutside);
+		this.game.events.on("blur", cancel);
+		this.events.once("shutdown", () => {
+			this.input.off("pointerup", releaseOutside);
+			this.input.off("pointerupoutside", releaseOutside);
+			this.game.events.off("blur", cancel);
+		});
+		refresh();
+		return { refresh, cancel };
+	}
 
-const scaleX = button.scaleX;
-const scaleY = button.scaleY;
-let pressed = false;
+	private setupWigbeekButton(): void {
+		const videoKey = "wm-login-intro";
+		let video: Phaser.GameObjects.Video | undefined;
+		const control = this.bindSheetButton("wm-wigbeek-button", () => {
+			if (!video) {
+				console.warn(`Load ${videoKey} as a Video in asset-pack.json.`);
+				return;
+			}
+			this.introPlaying = true;
+			this.sound.stopByKey("build_your_empire_of_trash");
+			try {
+				video.setCurrentTime(0);
+				video.setMute(false).setVolume(0.5);
+				video.play(false);
+			} catch (error) {
+				console.warn("Welcome video could not start.", error);
+				reset();
+			}
+		}, () => this.introPlaying, true);
+		if (!control) return;
+		if (!this.cache.video.exists(videoKey)) {
+			console.warn(`Missing video asset: ${videoKey}. Button hover still works.`);
+			return;
+		}
 
-setLight(false);
+		video = this.add.video(640, 360, videoKey).setDepth(1).setVisible(false);
+		video.setMute(false).setVolume(0.5);
+		const fitVideo = () => {
+			if (!video || video.width <= 0 || video.height <= 0) return;
+			video.setPosition(this.scale.width / 2, this.scale.height / 2);
+			video.setDisplaySize(this.scale.width, this.scale.height);
+		};
+		const reset = () => {
+			this.introPlaying = false;
+			video?.setVisible(false);
+			video?.stop();
+			control.cancel();
+		};
+		video.on("play", () => {
+			fitVideo();
+			video?.setVisible(true);
+		});
+		video.on("textureready", fitVideo);
+		video.on("complete", reset);
+		video.on("error", (error: unknown) => {
+			console.warn("Welcome video playback failed.", error);
+			reset();
+		});
+		video.on("unsupported", () => {
+			console.warn("This browser cannot play the welcome video.");
+			reset();
+		});
+		this.scale.on("resize", fitVideo);
+		this.events.once("shutdown", () => {
+			this.scale.off("resize", fitVideo);
+			video?.stop();
+			this.introPlaying = false;
+		});
+	}
 
-const animatePress = (down: boolean) => {
-	this.tweens.killTweensOf(button);
-
-	this.tweens.add({
-		targets: button,
-		scaleX: scaleX * (down ? 0.96 : 1),
-		scaleY: scaleY * (down ? 0.96 : 1),
-		duration: down ? 70 : 180,
-		ease: down ? "Quad.Out" : "Back.Out"
-	});
-};
-
-button.on("pointerover", () => {
-	hovered = true;
-	setLight(true);
-});
-
-button.on("pointerout", () => {
-	hovered = false;
-	pressed = false;
-	setLight(false);
-	animatePress(false);
-});
-
-button.on("pointerdown", () => {
-	pressed = true;
-	setLight(true);
-	animatePress(true);
-});
-
-button.on("pointerup", () => {
-	if (!pressed) return;
-
-	pressed = false;
-	setLight(true);
-	animatePress(false);
-
-	// Wallet connection will go here.
-	this.showComingSoon();
-});
-
-button.on("pointerupoutside", () => {
-	pressed = false;
-	setLight(hovered);
-	animatePress(false);
-});
-}
 private showComingSoon(): void {
 	// Prevent multiple popups.
 	if (this.children.getByName("comingSoonModal")) return;
@@ -208,6 +277,7 @@ private showComingSoon(): void {
 	this.input.keyboard?.on("keydown-ESC", dismiss);
 	this.events.once("shutdown", cleanup);
 }
+
 	/* END-USER-CODE */
 }
 
