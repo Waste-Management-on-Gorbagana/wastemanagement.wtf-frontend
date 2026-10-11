@@ -53,7 +53,7 @@ export default class Level extends Phaser.Scene {
 		// The video contains the music. Remove the old click-anywhere soundtrack.
 		this.sound.stopByKey("build_your_empire_of_trash");
 
-		this.bindSheetButton("wm-connect-wallet-button", () => this.showComingSoon());
+		this.bindSheetButton("wm-connect-wallet-button", () => this.scene.start("Game"));
 		this.bindSheetButton("wm-powered-by-gorbagana", () => {
 			window.open("https://www.gorbagana.wtf", "_blank", "noopener,noreferrer");
 		});

@@ -1,6 +1,8 @@
 import Phaser from "phaser";
 import Level from "./scenes/Level";
 import Preload from "./scenes/Preload";
+import Game from "./scenes/Game";
+import { ensureGameShell, mountAlleyPreview } from "./ui/CommandPanel";
 
 class Boot extends Phaser.Scene {
 
@@ -15,12 +17,20 @@ class Boot extends Phaser.Scene {
 
     create() {
 
-       this.scene.start("Preload");
+        const welcome = this.scene.get("Level");
+        // Temporary preview entry; does not modify the existing wallet button.
+        welcome.events.on(Phaser.Scenes.Events.CREATE, () => {
+            const removePreview = mountAlleyPreview(() => welcome.scene.start("Game"));
+            welcome.events.once(Phaser.Scenes.Events.SHUTDOWN, removePreview);
+        });
+        this.scene.start("Preload");
     }
 }
 
 window.addEventListener('load', function () {
 	
+	ensureGameShell();
+
 	const game = new Phaser.Game({
 		width: 1280,
 		height: 720,
@@ -30,7 +40,7 @@ window.addEventListener('load', function () {
 			mode: Phaser.Scale.ScaleModes.FIT,
 			autoCenter: Phaser.Scale.Center.CENTER_BOTH
 		},
-		scene: [Boot, Preload, Level]
+		scene: [Boot, Preload, Level, Game]
 	});
 
 	game.scene.start("Boot");

@@ -1,0 +1,92 @@
+/* Reference console: compact illustrated instruments, live text and floor controls. */
+.wm-shell { --wm-text:#f4e2ba; --wm-muted:#b9a888; }
+.wm-shell.wm-in-game { grid-template-columns:minmax(0,1fr) clamp(360px,39vw,560px); }
+.wm-command { padding:25px 23px; gap:6px; background:#201c16; border:0; isolation:isolate; }
+.wm-command::before { content:""; position:absolute; inset:0; z-index:-1; pointer-events:none; border:20px solid transparent; border-image:url('/assets/ui/console-frame.png') 170 160 170 160 / 20px / 0 stretch; }
+.wm-command > * { flex-shrink:0; }
+.wm-company-header { min-height:86px; padding:16px 18px; gap:12px; border:0; background:url('/assets/ui/company-nameplate.png') center / 100% 145% no-repeat; }
+.wm-company-kicker { display:none; }
+.wm-company-header .wm-business-name { font-family:Impact,'Arial Narrow',sans-serif; font-size:clamp(25px,2.4vw,38px); color:#201b13; text-transform:uppercase; line-height:1; }
+.wm-company-logo-frame { width:58px; height:58px; padding:3px; background:#41372316; border:1px dashed #76654a; box-shadow:none; }
+.wm-rewards-row { display:block; padding:0; border:0; background:none; }
+.wm-rewards-row > div,.wm-rewards-row > small { display:none; }
+.wm-rewards-row button { width:100%; min-height:72px; border:0; padding:15px; background:url('/assets/ui/action-button.png') center / 100% 150% no-repeat; font-family:Impact,'Arial Narrow',sans-serif; font-size:clamp(25px,2.5vw,39px); text-transform:uppercase; color:#ffe7b4; text-shadow:0 2px #693a16; }
+.wm-rewards-row button:disabled { opacity:1; cursor:not-allowed; }
+.wm-market-row { gap:5px; border:0; background:none; }
+.wm-market-cell,.wm-market-cell + .wm-market-cell { min-height:102px; padding:18px 17px; border:0; background:url('/assets/ui/stats-screen.png') center / 100% 140% no-repeat; }
+.wm-data-label { color:#ead5ac; font:bold 14px 'Arial Narrow',Arial,sans-serif; letter-spacing:0; }
+.wm-market-cell .wm-data-label { padding-left:13px; }
+.wm-market-cell > strong { margin:9px 0 5px; font:bold 24px monospace; text-align:center; }
+.wm-market-cell > small { font:12px Arial,sans-serif; color:#bda886; text-align:center; }
+[data-wallet-status] { display:none !important; }
+.wm-rank-row { display:grid; grid-template-columns:1fr 2fr; padding:0; gap:5px; background:none; border:0; }
+.wm-rank-row > div { padding:8px 12px; gap:8px; border:2px solid #816143; background:#1c1914; border-radius:5px; }
+.wm-rank-row strong { font:bold 19px monospace; }
+.wm-rank-links { display:grid; grid-template-columns:1fr 1fr; gap:4px; }
+.wm-leaderboard-link { min-height:47px; padding:8px 6px; border:0; background:url('/assets/ui/nav-button.png') center / 100% 145% no-repeat; color:#f8e3b7 !important; font:bold 12px 'Arial Narrow',Arial,sans-serif !important; text-transform:uppercase; text-decoration:none; }
+[data-open-marketplace] { background-image:url('/assets/ui/action-button.png'); }
+.wm-tower { flex:0 0 auto; min-height:0; padding:0; border:0; background:none; display:flex; gap:7px; }
+.wm-tower-heading,.wm-tower-ground,.wm-tower-hint { display:none; }
+.wm-tower-window { position:relative; flex:none; width:100%; aspect-ratio:4/3; min-height:0; padding:0; overflow:hidden; border:5px ridge #806244; border-radius:6px; background:#211b13 url('/assets/ui/tower-navigator.png') center / cover no-repeat; }
+.wm-tower-window[data-built='false'] { background-blend-mode:luminosity; }
+.wm-floor-stack { position:absolute; inset:0; padding:0; border:0; display:block; }
+.wm-tower-floor { position:absolute; left:4%; width:92%; min-height:42px; grid-template-columns:35px 1fr; background:#15120db8; border:1px solid #806747; box-shadow:none; }
+.wm-tower-floor[aria-pressed='true'] { border-color:#d2ad6b; background:#392d18c9; box-shadow:0 0 12px #e8b34355,inset 3px 0 #efc46e; }
+.wm-floor-number { color:#ffe1a4; border-color:#967b50; }
+.wm-tower-floor strong { color:#f4e0ba; font-size:13px; }
+.wm-floor-windows { display:none; }
+.wm-locked-levels { position:absolute; left:4%; top:10%; height:61%; display:flex; flex-direction:column; justify-content:space-between; }
+.wm-locked-levels span { border:2px ridge #735d40; border-radius:7px; background:#2a221acc; color:#a68e66; padding:5px 12px; font:bold 19px monospace; }
+.wm-recycling-meter { padding:5px 10px 10px; border:2px ridge #846748; border-radius:5px; background:#211b14; }
+.wm-recycling-meter > div { display:flex; justify-content:space-between; gap:8px; margin-bottom:8px; font:14px 'Arial Narrow',Arial,sans-serif; }
+.wm-recycling-meter progress { display:block; width:100%; height:17px; appearance:none; border:2px ridge #a48a62; border-radius:5px; overflow:hidden; background:#100e0a; }
+.wm-recycling-meter progress::-webkit-progress-bar { background:#100e0a; }
+.wm-recycling-meter progress::-webkit-progress-value { background:linear-gradient(#efc270,#936321); }
+.wm-recycling-meter progress::-moz-progress-bar { background:#ca9948; }
+.wm-recycler-controls { margin:0; }
+.wm-recycler-controls p { margin:3px 0; font-size:12px; color:#d6c2a0; }
+.wm-recycler-controls small { font:10px Arial,sans-serif; color:#ac9e88; }
+.wm-recycler-controls button,.wm-back-to-tower { min-height:44px; padding:9px 15px; border:1px solid #94744a; border-radius:5px; background:#49351e; }
+.wm-camera-controls { order:10; display:flex; align-items:center; flex-wrap:wrap; gap:5px; padding-top:3px; }
+.wm-camera-controls button { min-height:36px; min-width:32px; padding:5px 10px; background:#292219; border:1px solid #7c6342; border-radius:4px; font-size:12px; }
+.wm-camera-controls span { font:11px monospace; }
+.wm-camera-controls button:disabled { opacity:.45; }
+.wm-leaderboard-view,.wm-marketplace-view { background:#211b14; }
+.wm-command button:not(:disabled):hover { filter:brightness(1.15); }
+@media (max-width:900px) { .wm-shell.wm-in-game { grid-template-columns:minmax(0,1fr); grid-template-rows:minmax(180px,1fr) clamp(250px,44dvh,440px); } .wm-command { padding:18px 23px; } .wm-tower-window { max-height:360px; } }
+@media (max-width:900px) and (max-height:520px) { .wm-shell.wm-in-game { grid-template-columns:minmax(0,1fr) 340px; grid-template-rows:minmax(0,1fr); } }
+
+/* Selected-level tool list. */
+.wm-recycler-controls { display:flex; flex-direction:column; gap:8px; padding:12px; border:1px solid #70563a; border-radius:5px; background:#191610; }
+.wm-recycler-controls h3 { margin:0; color:#f2d8aa; font:bold 16px Arial,sans-serif; }
+.wm-tool-list { display:grid; gap:8px; }
+.wm-tool-list .wm-tool-option { display:flex; align-items:center; width:100%; gap:12px; padding:10px; text-align:left; background:#282219; border:2px solid #6f593c; }
+.wm-tool-option img { width:74px; height:62px; object-fit:contain; }
+.wm-tool-option strong { display:block; margin-bottom:5px; font-size:15px; }
+.wm-tool-option small { display:block; font-size:12px; line-height:1.4; }
+.wm-tool-list .wm-tool-option[aria-pressed='true'] { border-color:#f1b65f; background:#49351e; box-shadow:inset 3px 0 #f1b65f; }
+.wm-tool-option:disabled { opacity:.5; }
+.wm-recycler-controls [data-assign-tool] { background:#a7561d; color:#fff0cb; font-weight:bold; }
+.wm-recycler-controls [data-assign-tool]:disabled { opacity:.4; }
+
+/* The selected-level console occupies the remaining panel space. */
+.wm-command > .wm-tower { flex:1 0 auto; }
+.wm-level-details { flex:1; display:flex; flex-direction:column; min-height:260px; padding:12px; border:5px ridge #876647; border-radius:7px; background:radial-gradient(ellipse at top,#3b3020,#17130e 70%); box-shadow:inset 0 0 22px #000b; }
+.wm-level-details .wm-recycler-controls { flex:1; border:0; background:none; padding:0; gap:12px; }
+.wm-level-details h3 { min-height:54px; display:flex; align-items:center; padding:12px 16px; background:url('/assets/ui/company-nameplate.png') center / 100% 145% no-repeat; color:#2a2117; text-transform:uppercase; font:bold 20px 'Arial Narrow',Arial,sans-serif; }
+.wm-tool-list .wm-tool-option { min-height:114px; border:3px ridge #92734b; padding:16px; background:linear-gradient(120deg,#30271a,#17140f); box-shadow:inset 0 0 18px #0009; }
+.wm-tool-list .wm-tool-option[aria-pressed='true'] { border-color:#edbd70; background:linear-gradient(120deg,#4a3620,#241b10); }
+.wm-tool-art-pending { flex:0 0 74px; display:grid; place-content:center; min-height:70px; border:1px dashed #796344; color:#ad9878; text-align:center; font:10px monospace; line-height:1.7; }
+.wm-tool-option strong { font-size:19px; text-transform:uppercase; }
+.wm-level-details .wm-recycler-controls [data-assign-tool] { min-height:62px; border:0; background:url('/assets/ui/action-button.png') center / 100% 150% no-repeat; color:#ffe3b2; font:bold 23px 'Arial Narrow',Arial,sans-serif; text-transform:uppercase; text-shadow:0 2px #653613; }
+.wm-level-details .wm-recycler-controls > small { margin-top:auto; padding-top:12px; }
+.wm-level-details .wm-recycling-meter { order:2; margin-top:14px; }
+
+/* Recycler artwork is a separate tool, not the dumpster building. */
+.wm-tool-option .wm-recycler-art { flex:0 0 100px; width:100px; height:100px; object-fit:contain; }
+.wm-installed-tool { display:flex; align-items:center; gap:14px; padding:12px; border:3px ridge #92734b; border-radius:5px; background:linear-gradient(120deg,#30271a,#17140f); }
+.wm-installed-tool .wm-recycler-art { width:clamp(100px,12vw,160px); height:150px; object-fit:contain; flex-shrink:0; }
+.wm-installed-tool strong { display:block; margin:7px 0; color:#f2d8aa; font:bold 19px 'Arial Narrow',Arial,sans-serif; text-transform:uppercase; }
+.wm-installed-tool span { color:#c6b28f; font-size:12px; }
+.wm-recycler-controls [data-unassign-tool] { color:#e7c99a; background:linear-gradient(#352a1d,#211a12); border:2px ridge #94744a; font-weight:bold; }
+.wm-recycler-controls button:focus-visible { outline:2px solid #ffd28a; outline-offset:3px; }
