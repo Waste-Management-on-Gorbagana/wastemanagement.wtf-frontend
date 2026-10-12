@@ -1,0 +1,101 @@
+/* Approved artwork, opaque-backed controls, live content. Assets are DOM backgrounds. */
+.wm-shell.wm-in-game { grid-template-columns:minmax(0,1fr) clamp(360px,34vw,510px); grid-template-rows:minmax(0,1fr); }
+.wm-command.wm-command { padding:0; gap:0; border:0; background:transparent; box-shadow:none; scrollbar-color:#875724 #101611; }
+.wm-console-body { flex:0 0 auto; min-height:100%; padding:11% 8% 14% 16%; display:flex; flex-direction:column; gap:9px; background:url('/assets/ui/wm-retro-neon/panel-shell.png') center / 100% 100% no-repeat; }
+.wm-brand-header { width:100%; }
+.wm-brand-header img { display:block; width:100%; height:auto; }
+.wm-command.wm-command .wm-company-header { flex-shrink:0; min-height:76px; display:flex; justify-content:flex-start; gap:12px; padding:12px 16px; border:0; background:url('/assets/ui/wm-retro-neon/player-nameplate.png') center/100% 100% no-repeat; }
+.wm-command.wm-command .wm-company-logo-frame { flex:0 0 48px; width:48px;height:48px; background:#1c201e; border:2px ridge #866a49; padding:3px; box-shadow:none; }
+.wm-command.wm-command .wm-company-header .wm-business-name { color:#181d17; font: bold clamp(20px,2.2vw,32px)/1.1 Impact,'Arial Narrow',sans-serif; overflow-wrap:anywhere; }
+.wm-command.wm-command .wm-rewards-row { display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:0;border:0;background:none; }
+.wm-command.wm-command .wm-rewards-row button { min-height:52px;padding:10px 12px;border:0;background:url('/assets/ui/wm-retro-neon/button-orange.png') center/100% 100% no-repeat;font:bold 12px/1.2 'Arial Narrow',Arial,sans-serif;text-transform:uppercase;color:#fff3d3; }
+.wm-command.wm-command .wm-rewards-row button[data-open-treasury] { background-image:url('/assets/ui/wm-retro-neon/button-steel.png'); }
+.wm-command.wm-command .wm-rewards-row button:disabled { opacity:1; color:#baa989; }
+.wm-command.wm-command .wm-market-row { display:grid; grid-template-columns:1fr 1fr;gap:7px;background:none;border:0; }
+.wm-command.wm-command .wm-market-cell { min-height:92px; padding:12px 13px 8px; border:0;background:url('/assets/ui/wm-retro-neon/display-staked.png') center/100% 100% no-repeat; }
+.wm-command.wm-command .wm-market-cell + .wm-market-cell { border:0; }
+.wm-command.wm-command .wm-market-cell:nth-child(2) {background-image:url('/assets/ui/wm-retro-neon/display-treasury.png');}
+.wm-command.wm-command .wm-market-cell.wm-net-value {grid-column:1/-1;min-height:74px;background-image:url('/assets/ui/wm-retro-neon/display-net-value.png');}
+.wm-command.wm-command .wm-data-label {font:bold 11px/1.3 'Arial Narrow',Arial,sans-serif;color:#f2e5c5;letter-spacing:0;}
+.wm-command.wm-command .wm-market-cell .wm-data-label {padding-left:12px;}
+.wm-command.wm-command .wm-market-cell strong {font:bold 20px/1.2 monospace;margin:10px 0 3px;text-align:center;color:#f2e5c5;overflow-wrap:anywhere;}
+.wm-command.wm-command .wm-market-cell small {font:9px Arial,sans-serif;text-align:center;color:#b8ab8b;}
+.wm-command.wm-command .wm-rank-row {display:grid;grid-template-columns:1fr 2fr;gap:5px;padding:0;border:0;background:none;}
+.wm-command.wm-command .wm-rank-row > div {padding:9px;gap:6px;background:url('/assets/ui/wm-retro-neon/display-rank.png') center/100% 100% no-repeat;}
+.wm-command.wm-command .wm-rank-row strong {font:bold 16px monospace;}
+.wm-command.wm-command .wm-rank-links {display:grid;grid-template-columns:1fr 1fr;gap:4px;}
+.wm-command.wm-command .wm-leaderboard-link,.wm-command.wm-command .wm-back-to-tower {min-height:44px;padding:8px 6px;border:0;background:url('/assets/ui/wm-retro-neon/button-navigation.png') center/100% 100% no-repeat;font:bold 10px Arial,sans-serif;text-transform:uppercase;text-decoration:none;color:#f2e5c5;}
+.wm-command.wm-command .wm-tower {flex:0 0 auto;padding:0;gap:8px;background:none;border:0;}
+.wm-tower-heading,.wm-tower-ground,.wm-tower-hint {display:none;}
+.wm-level-expansion {padding:12px 10px 4px;background:#081510;border:2px ridge #86704c;border-radius:7px;}
+.wm-command.wm-command [data-stake-next-level] {width:100%;min-height:54px;border:0;padding:12px;background:url('/assets/ui/wm-retro-neon/button-orange.png') center/100% 100% no-repeat;color:#fff1d1;font:bold 17px 'Arial Narrow',Arial,sans-serif;text-transform:uppercase;}
+.wm-command.wm-command [data-stake-next-level]:disabled {background-image:url('/assets/ui/wm-retro-neon/button-unlock-disabled.png');color:#979994;opacity:1;cursor:not-allowed;}
+.wm-command.wm-command [data-unlock-help] {font:11px/1.5 Arial,sans-serif;color:#e6d8bc;text-align:center;margin:8px 3px;}
+.wm-command.wm-command .wm-tower-window {flex:none;aspect-ratio:auto;height:auto;min-height:0;padding:0;border:0;background:none;overflow:visible;}
+.wm-command.wm-command .wm-floor-stack {position:static;display:flex;flex-direction:column;gap:6px;padding:0;border:0;background:none;}
+.wm-command.wm-command .wm-tower-floor {position:static;left:auto;flex:none;width:100%;min-height:53px;padding:12px 28px 12px 20px;display:grid;grid-template-columns:25px 1fr;gap:12px;border:0;box-shadow:none;background:url('/assets/ui/wm-retro-neon/display-net-value.png') center/100% 100% no-repeat;}
+.wm-command.wm-command .wm-tower-floor[aria-pressed='true'] {background-image:url('/assets/ui/wm-retro-neon/floor-row-selected.png');box-shadow:none;}
+.wm-command.wm-command .wm-tower-floor strong {font:bold 16px Arial,sans-serif;color:#f6e7c9;overflow-wrap:anywhere;}
+.wm-command.wm-command .wm-floor-number {color:#f6e7c9;}
+.wm-level-details {padding:12px 9px;min-height:280px;border:2px ridge #93784e;border-radius:7px;background:#0b0f0d;}
+.wm-command.wm-command .wm-recycler-controls {display:flex;flex-direction:column;gap:10px;margin:0;}
+.wm-command.wm-command .wm-editable-level-title {margin:0;background:url('/assets/ui/wm-retro-neon/section-nameplate.png') center/100% 100% no-repeat;}
+.wm-command.wm-command .wm-editable-level-title > button,.wm-command.wm-command .wm-editable-level-title > input {width:100%;min-height:54px;background:none;border:0;padding:12px 20px;text-align:left;font:bold 21px 'Arial Narrow',Arial,sans-serif;color:#202016;opacity:1;}
+.wm-command.wm-command .wm-editable-level-title > input {min-width:0;}
+.wm-name-announcement {position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);}
+.wm-command.wm-command .wm-tool-option,.wm-command.wm-command .wm-installed-tool {display:flex;align-items:center;gap:8px;width:100%;min-height:140px;padding:14px 12px;border:0;background:url('/assets/ui/wm-retro-neon/tool-card.png') center/100% 100% no-repeat;text-align:left;}
+.wm-command.wm-command .wm-tool-option[aria-pressed='true'] {outline:2px solid #31dee5;outline-offset:-5px;}
+.wm-command.wm-command .wm-recycler-art {width:38%;height:108px;object-fit:contain;flex-shrink:0;}
+.wm-command.wm-command .wm-tool-option strong,.wm-command.wm-command .wm-installed-tool strong {display:block;font:bold 17px 'Arial Narrow',Arial,sans-serif;color:#f4e5c4;text-transform:uppercase;}
+.wm-command.wm-command .wm-tool-option small,.wm-command.wm-command .wm-installed-tool span {display:block;margin-top:6px;font:11px/1.4 Arial,sans-serif;color:#d5c6a9;}
+.wm-command.wm-command .wm-installed-tool small {font-size:9px;}
+.wm-command.wm-command [data-assign-tool],.wm-command.wm-command [data-unassign-tool] {width:100%;min-height:55px;border:0;background:url('/assets/ui/wm-retro-neon/button-orange.png') center/100% 100% no-repeat;color:#fff1d1;font:bold 20px 'Arial Narrow',Arial,sans-serif;}
+.wm-command.wm-command [data-assign-tool]:disabled,.wm-command.wm-command [data-unassign-tool]:disabled {background-image:url('/assets/ui/wm-retro-neon/button-assign-disabled.png');color:#91958f;opacity:1;}
+.wm-command.wm-command .wm-recycler-controls p {font:12px/1.5 Arial,sans-serif;color:#e7dbc2;}
+.wm-command.wm-command .wm-recycler-controls > small {font:9px/1.4 Arial,sans-serif;color:#baa98b;margin-top:12px;}
+.wm-recycling-meter {padding:10px;background:#0c1812;border:1px solid #967140;margin-bottom:8px;}
+.wm-recycling-meter > div {display:flex;justify-content:space-between;font:11px Arial,sans-serif;margin-bottom:7px;}
+.wm-recycling-meter progress {width:100%;accent-color:#a0ed14;}
+.wm-command.wm-command button:not(:disabled):hover {filter:brightness(1.14);}
+.wm-command.wm-command button:not(:disabled):active {transform:translateY(1px);}
+.wm-command.wm-command button:focus-visible {outline:2px solid #35e0ec;outline-offset:-3px;}
+.wm-command.wm-command .wm-corporate {margin:0;padding:12% 8% 14% 16%;background:url('/assets/ui/wm-retro-neon/panel-shell.png') center/100% 100% no-repeat;min-height:100%;}
+.wm-command.wm-command[data-corporate-open='true'] > .wm-console-body {display:none;}
+.wm-command.wm-command .wm-corporate button {background-image:url('/assets/ui/wm-retro-neon/button-steel.png');background-size:100% 100%;}
+.wm-command.wm-command .wm-corporate .ct-primary {background-image:url('/assets/ui/wm-retro-neon/button-orange.png');}
+@media(max-width:900px) { .wm-shell.wm-in-game {grid-template-columns:minmax(0,1fr) min(48vw,390px);grid-template-rows:minmax(0,1fr);} .wm-console-body{padding-left:15%;padding-right:8%;} }
+@media(max-width:600px) { .wm-shell.wm-in-game {grid-template-columns:minmax(0,1fr) min(68vw,340px);} .wm-command.wm-command .wm-rewards-row {grid-template-columns:1fr;} .wm-command.wm-command .wm-market-cell strong {font-size:15px;} .wm-command.wm-command .wm-market-row {grid-template-columns:1fr;} .wm-command.wm-command .wm-rank-row {grid-template-columns:1fr;} .wm-command.wm-command .wm-tool-option,.wm-command.wm-command .wm-installed-tool {flex-wrap:wrap;} }
+@media(prefers-reduced-motion:reduce) { .wm-command.wm-command button{transition:none;} }
+
+/* Overlay layout: the world continues behind the PNG's transparent silhouette. */
+.wm-shell.wm-in-game {
+    display:block;
+    --wm-panel-width:clamp(360px,34vw,510px);
+}
+.wm-shell.wm-in-game > #game-container {
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    z-index:0;
+}
+.wm-shell.wm-in-game > .wm-command {
+    position:absolute;
+    inset:0 0 0 auto;
+    width:var(--wm-panel-width);
+    height:100%;
+    z-index:2;
+    margin:0;
+    padding:0;
+    border:0;
+    background:transparent;
+    box-shadow:none;
+    overflow-x:hidden;
+    overflow-y:auto;
+}
+@media(max-width:900px) {
+    .wm-shell.wm-in-game {--wm-panel-width:min(48vw,390px);}
+}
+@media(max-width:600px) {
+    .wm-shell.wm-in-game {--wm-panel-width:min(68vw,340px);}
+}

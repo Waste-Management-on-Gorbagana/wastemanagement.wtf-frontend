@@ -1,3 +1,4 @@
+@import "./shared-buttons.css";
 /* Reference console: compact illustrated instruments, live text and floor controls. */
 .wm-shell { --wm-text:#f4e2ba; --wm-muted:#b9a888; }
 .wm-shell.wm-in-game { grid-template-columns:minmax(0,1fr) clamp(360px,39vw,560px); }

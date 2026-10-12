@@ -1,3 +1,4 @@
+@import "./shared-buttons.css";
 .wm-setup {
     width: min(780px, calc(100vw - 28px)); max-height: calc(100vh - 28px); max-height: calc(100dvh - 28px);
     padding: 0; overflow-y: auto; color: #e9ebdf; background: #191f16;
@@ -251,11 +252,4 @@
     padding:20px max(34px,6.5%);
     background-position:center 50%;
     font-size:16px;
-}
-
-/* Explicit inset keeps typing and placeholder clear of the illustrated end cap. */
-.wm-setup input#wm-business-name {
-    padding-left:56px !important;
-    padding-right:48px !important;
-    text-indent:0;
 }

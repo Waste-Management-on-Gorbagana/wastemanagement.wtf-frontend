@@ -1,0 +1,212 @@
+{
+  "tool-section.png": {
+    "size": [
+      578,
+      615
+    ],
+    "alphaRange": [
+      255,
+      255
+    ]
+  },
+  "panel-shell.png": {
+    "size": [
+      769,
+      2045
+    ],
+    "alphaRange": [
+      0,
+      255
+    ]
+  },
+  "display-net-value.png": {
+    "size": [
+      594,
+      128
+    ],
+    "alphaRange": [
+      255,
+      255
+    ]
+  },
+  "button-assign-disabled.png": {
+    "size": [
+      537,
+      100
+    ],
+    "alphaRange": [
+      255,
+      255
+    ]
+  },
+  "player-nameplate.png": {
+    "size": [
+      591,
+      132
+    ],
+    "alphaRange": [
+      255,
+      255
+    ]
+  },
+  "trash-recycler.png": {
+    "size": [
+      1536,
+      1024
+    ],
+    "alphaRange": [
+      0,
+      255
+    ]
+  },
+  "panel-master.png": {
+    "size": [
+      769,
+      2045
+    ],
+    "alphaRange": [
+      0,
+      255
+    ]
+  },
+  "floor-row-selected.png": {
+    "size": [
+      579,
+      96
+    ],
+    "alphaRange": [
+      255,
+      255
+    ]
+  },
+  "floor-section.png": {
+    "size": [
+      606,
+      305
+    ],
+    "alphaRange": [
+      255,
+      255
+    ]
+  },
+  "button-steel.png": {
+    "size": [
+      292,
+      96
+    ],
+    "alphaRange": [
+      255,
+      255
+    ]
+  },
+  "button-orange.png": {
+    "size": [
+      300,
+      96
+    ],
+    "alphaRange": [
+      255,
+      255
+    ]
+  },
+  "button-unlock-disabled.png": {
+    "size": [
+      553,
+      95
+    ],
+    "alphaRange": [
+      255,
+      255
+    ]
+  },
+  "display-treasury.png": {
+    "size": [
+      291,
+      167
+    ],
+    "alphaRange": [
+      255,
+      255
+    ]
+  },
+  "display-staked.png": {
+    "size": [
+      300,
+      167
+    ],
+    "alphaRange": [
+      255,
+      255
+    ]
+  },
+  "footer-grille.png": {
+    "size": [
+      607,
+      143
+    ],
+    "alphaRange": [
+      255,
+      255
+    ]
+  },
+  "button-navigation.png": {
+    "size": [
+      199,
+      79
+    ],
+    "alphaRange": [
+      255,
+      255
+    ]
+  },
+  "button-marketplace.png": {
+    "size": [
+      194,
+      79
+    ],
+    "alphaRange": [
+      255,
+      255
+    ]
+  },
+  "tool-card.png": {
+    "size": [
+      538,
+      244
+    ],
+    "alphaRange": [
+      255,
+      255
+    ]
+  },
+  "section-nameplate.png": {
+    "size": [
+      542,
+      101
+    ],
+    "alphaRange": [
+      255,
+      255
+    ]
+  },
+  "brand-header.png": {
+    "size": [
+      586,
+      170
+    ],
+    "alphaRange": [
+      255,
+      255
+    ]
+  },
+  "display-rank.png": {
+    "size": [
+      195,
+      79
+    ],
+    "alphaRange": [
+      255,
+      255
+    ]
+  }
+}

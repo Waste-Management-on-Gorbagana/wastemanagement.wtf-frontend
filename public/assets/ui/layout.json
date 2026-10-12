@@ -1,0 +1,154 @@
+{
+  "canvas": {
+    "width": 769,
+    "height": 2045
+  },
+  "base": "assets/panel-master.png",
+  "shell": "assets/panel-shell.png",
+  "assets": {
+    "brand-header": {
+      "file": "assets/brand-header.png",
+      "x": 128,
+      "y": 82,
+      "width": 586,
+      "height": 170,
+      "interiorOpaque": true
+    },
+    "player-nameplate": {
+      "file": "assets/player-nameplate.png",
+      "x": 125,
+      "y": 266,
+      "width": 591,
+      "height": 132,
+      "interiorOpaque": true
+    },
+    "button-orange": {
+      "file": "assets/button-orange.png",
+      "x": 119,
+      "y": 411,
+      "width": 300,
+      "height": 96,
+      "interiorOpaque": true
+    },
+    "button-steel": {
+      "file": "assets/button-steel.png",
+      "x": 424,
+      "y": 411,
+      "width": 292,
+      "height": 96,
+      "interiorOpaque": true
+    },
+    "display-staked": {
+      "file": "assets/display-staked.png",
+      "x": 118,
+      "y": 518,
+      "width": 300,
+      "height": 167,
+      "interiorOpaque": true
+    },
+    "display-treasury": {
+      "file": "assets/display-treasury.png",
+      "x": 423,
+      "y": 518,
+      "width": 291,
+      "height": 167,
+      "interiorOpaque": true
+    },
+    "display-net-value": {
+      "file": "assets/display-net-value.png",
+      "x": 119,
+      "y": 689,
+      "width": 594,
+      "height": 128,
+      "interiorOpaque": true
+    },
+    "display-rank": {
+      "file": "assets/display-rank.png",
+      "x": 118,
+      "y": 827,
+      "width": 195,
+      "height": 79,
+      "interiorOpaque": true
+    },
+    "button-navigation": {
+      "file": "assets/button-navigation.png",
+      "x": 319,
+      "y": 826,
+      "width": 199,
+      "height": 79,
+      "interiorOpaque": true
+    },
+    "button-marketplace": {
+      "file": "assets/button-marketplace.png",
+      "x": 523,
+      "y": 826,
+      "width": 194,
+      "height": 79,
+      "interiorOpaque": true
+    },
+    "floor-section": {
+      "file": "assets/floor-section.png",
+      "x": 109,
+      "y": 915,
+      "width": 606,
+      "height": 305,
+      "interiorOpaque": true
+    },
+    "button-unlock-disabled": {
+      "file": "assets/button-unlock-disabled.png",
+      "x": 141,
+      "y": 947,
+      "width": 553,
+      "height": 95,
+      "interiorOpaque": true
+    },
+    "floor-row-selected": {
+      "file": "assets/floor-row-selected.png",
+      "x": 126,
+      "y": 1095,
+      "width": 579,
+      "height": 96,
+      "interiorOpaque": true
+    },
+    "tool-section": {
+      "file": "assets/tool-section.png",
+      "x": 124,
+      "y": 1230,
+      "width": 578,
+      "height": 615,
+      "interiorOpaque": true
+    },
+    "section-nameplate": {
+      "file": "assets/section-nameplate.png",
+      "x": 146,
+      "y": 1247,
+      "width": 542,
+      "height": 101,
+      "interiorOpaque": true
+    },
+    "tool-card": {
+      "file": "assets/tool-card.png",
+      "x": 146,
+      "y": 1362,
+      "width": 538,
+      "height": 244,
+      "interiorOpaque": true
+    },
+    "button-assign-disabled": {
+      "file": "assets/button-assign-disabled.png",
+      "x": 147,
+      "y": 1610,
+      "width": 537,
+      "height": 100,
+      "interiorOpaque": true
+    },
+    "footer-grille": {
+      "file": "assets/footer-grille.png",
+      "x": 108,
+      "y": 1851,
+      "width": 607,
+      "height": 143,
+      "interiorOpaque": true
+    }
+  }
+}

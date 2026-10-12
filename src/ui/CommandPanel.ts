@@ -1,6 +1,7 @@
 import "./command-panel.css";
-import "./console-art.css";
+import { CorporateTreasury, TreasurySnapshot } from "./CorporateTreasury";
 import { BusinessPreview } from "../business/BusinessPreview";
+import "./retro-neon.css";
 
 
 /** One DOM host shared by the welcome scene and game scene. */
@@ -46,7 +47,9 @@ export class CommandPanel {
     private readonly shell = ensureGameShell();
     private readonly element = document.createElement("aside");
     private readonly abort = new AbortController();
+    private readonly treasury: CorporateTreasury;
     private floors: TowerFloor[] = [];
+    private treasurySnapshot: TreasurySnapshot | null = null;
     private floorNames: Record<string, string> = {};
     private floorNamesKey = "";
     private editingFloorId: string | null = null;
@@ -61,31 +64,31 @@ export class CommandPanel {
 
     constructor(business: BusinessPreview | null = null, private readonly onFloorSelect: (floor: TowerFloor) => void = () => {}, private readonly onAssignTool: (toolId: string) => void = () => {}, private readonly onView: (action: string) => void = () => {}, private readonly onUnassignTool: () => void = () => {}, private readonly onStakeNextLevel: () => void = () => {}) {
         this.element.className = "wm-command";
-        this.element.dataset.uiVersion = "recycler-unassign-v18";
+        this.element.dataset.uiVersion = "retro-neon-v1";
         this.element.setAttribute("aria-label", "Waste Management command panel");
-        this.element.innerHTML = `
+        this.element.innerHTML = `<div class="wm-console-body">
+            <header class="wm-brand-header"><img src="/assets/ui/wm-retro-neon/brand-header.png" alt="WM — Institutional Gorbage"></header>
             <header class="wm-company-header">
-                <div><span class="wm-company-kicker">YOUR BUSINESS</span><strong class="wm-business-name">Establish your business</strong></div>
-                <div class="wm-company-logo-frame"><img class="wm-business-logo" alt="Company logo" hidden><span class="wm-logo-placeholder" aria-hidden="true">—</span></div>
+                <div class="wm-company-logo-frame"><img class="wm-business-logo" alt="Player brand symbol" hidden><span class="wm-logo-placeholder" aria-hidden="true">◇</span></div>
+                <strong class="wm-business-name">Establish your business</strong>
             </header>
-            <div class="wm-rewards-row"><div><span class="wm-data-label">STAKING REWARDS</span><strong>—</strong></div><button type="button" disabled title="Revenue claims are not connected yet">Claim rewards</button><small>Game revenue shared with WM stakers · Claims not connected</small></div>
-            <div class="wm-market-row" aria-label="WM market and wallet">
-                <div class="wm-market-cell"><span class="wm-data-label">WM PRICE</span><strong data-price>—</strong><small class="wm-market-change" data-change>24H —</small></div>
-                <div class="wm-market-cell"><span class="wm-data-label">WM BALANCE</span><strong data-wallet>—</strong><small data-wallet-status>Wallet not connected</small></div>
+            <div class="wm-rewards-row"><button type="button" disabled title="Revenue claims are not connected yet">Claim rewards</button><button type="button" data-open-treasury aria-expanded="false">Corporate Treasury</button></div>
+            <div class="wm-market-row" aria-label="Corporation balances">
+                <div class="wm-market-cell"><span class="wm-data-label">STAKED WM</span><strong data-staked>— WM</strong><small data-stake-mode></small></div>
+                <div class="wm-market-cell"><span class="wm-data-label">TREASURY GOR</span><strong data-treasury-gor>— GOR</strong></div>
+                <div class="wm-market-cell wm-net-value"><span class="wm-data-label">CORPORATION NET VALUE</span><strong data-net-value>— GOR</strong></div>
             </div>
             <div class="wm-rank-row"><div><span class="wm-data-label">RANK</span><strong data-rank>—</strong></div><nav class="wm-rank-links" aria-label="Business links"><button type="button" class="wm-leaderboard-link" data-open-leaderboard aria-expanded="false">Leaderboard</button><button type="button" class="wm-leaderboard-link" data-open-marketplace aria-expanded="false">Marketplace</button></nav></div>
             <section class="wm-tower" aria-label="Tower floor navigation">
                 <div class="wm-tower-heading"><span>YOUR TOWER</span><span data-floor-count>THE ALLEY</span></div>
+                <div class="wm-level-expansion">
+                    <button type="button" data-stake-next-level disabled aria-describedby="wm-unlock-help">Unlock New Floor</button>
+                    <p id="wm-unlock-help" data-unlock-help>Complete the previous floor requirements.</p>
+                </div>
                 <div class="wm-tower-window">
 
                     <div class="wm-floor-stack"></div>
                     <div class="wm-tower-ground" aria-hidden="true"></div>
-                </div>
-                <div class="wm-level-expansion" hidden>
-                    <strong>Level 1 available</strong>
-                    <p>100 accounts recycled. Stake another 100,000 WM to unlock Level 1.</p>
-                    <button type="button" data-stake-next-level>Stake 100,000 WM &amp; unlock Level 1</button>
-                    <small>SIMULATED · No WM moves. Total required stake: 200,000 WM.</small>
                 </div>
                 <div class="wm-level-details">
                 <div class="wm-recycling-meter" hidden><div><strong>ACCOUNTS RECYCLED</strong><span data-recycle-count>0 / 100</span></div><progress data-recycle-meter max="100" value="0" aria-label="Accounts recycled"></progress></div>
@@ -99,8 +102,8 @@ export class CommandPanel {
                         </button>
                     </div>
                     <div class="wm-installed-tool" hidden><img src="/assets/gameplay/trash-recycler.png" alt="Trash Recycler machine" class="wm-recycler-art"><div><small>ASSIGNED TOOL</small><strong>Trash Recycler</strong><span>Installed in level 0</span></div></div>
-                    <button type="button" data-unassign-tool hidden>Unassign tool</button>
-                    <button type="button" data-assign-tool disabled hidden>Assign to level</button>
+                    <button type="button" data-unassign-tool hidden>Unassign</button>
+                    <button type="button" data-assign-tool disabled hidden>Assign</button>
                     <p data-recycler-status aria-live="polite">Establish your business to unlock the first level.</p>
                     <small>SESSION PREVIEW · No WM moves or rent is reclaimed.</small>
                 </div>
@@ -118,13 +121,20 @@ export class CommandPanel {
                 <h2>Business leaderboard</h2>
                 <p>Rankings will appear here when the leaderboard service is connected.</p>
             </section>
-        `;
+        </div>`;
         this.shell.classList.add("wm-in-game");
         this.shell.append(this.element);
+        this.treasury = new CorporateTreasury(() => this.closeTreasury());
+        this.element.append(this.treasury.element);
         if (business) this.setBusiness(business);
         this.element.addEventListener("click", event => {
             const button = (event.target as HTMLElement).closest<HTMLButtonElement>("button");
             if (!button || button.disabled) return;
+            if (button.hasAttribute("data-open-treasury")) {
+                this.element.dataset.corporateOpen = "true";
+                button.setAttribute("aria-expanded", "true");
+                this.treasury.show();
+            }
             if (button.hasAttribute("data-stake-next-level") && this.expansionEligible && !this.expansionUnlocked && !this.toolProcessing) this.onStakeNextLevel();
             if (button.dataset.camera) this.onView(button.dataset.camera);
             if (button.dataset.selectTool && this.canAssignTool()) {
@@ -184,6 +194,9 @@ export class CommandPanel {
 
     setRecycler(established: boolean, built: boolean, recycled: number, target: number): void {
         this.recyclerState = { established, built, recycled, target };
+        this.treasury.setPreviewStake(established ? this.expansionUnlocked ? "200000" : "100000" : null);
+        this.renderBalances();
+        this.renderExpansion();
         this.element.querySelector("[data-recycle-count]")!.textContent = `${recycled} / ${target}`;
         const meter = this.element.querySelector<HTMLProgressElement>("[data-recycle-meter]")!;
         meter.max = target; meter.value = recycled;
@@ -194,7 +207,9 @@ export class CommandPanel {
     setExpansion(eligible: boolean, unlocked: boolean): void {
         this.expansionEligible = eligible;
         this.expansionUnlocked = unlocked;
-        this.element.querySelector<HTMLElement>(".wm-level-expansion")!.hidden = !eligible || unlocked;
+        this.treasury.setPreviewStake(this.recyclerState.established ? unlocked ? "200000" : "100000" : null);
+        this.renderBalances();
+        this.renderExpansion();
         this.element.querySelector<HTMLButtonElement>("[data-stake-next-level]")!.disabled = this.toolProcessing || !eligible || unlocked;
         this.renderSlot();
     }
@@ -204,7 +219,10 @@ export class CommandPanel {
         this.element.querySelector<HTMLButtonElement>("[data-stake-next-level]")!.disabled = processing || !this.expansionEligible || this.expansionUnlocked;
         const button = this.element.querySelector<HTMLButtonElement>("[data-unassign-tool]")!;
         button.disabled = processing;
-        button.textContent = processing ? "Processing… Unassign unavailable" : "Unassign tool";
+        button.textContent = "Unassign";
+        this.renderExpansion();
+        this.element.querySelectorAll<HTMLButtonElement>("[data-floor]").forEach(b => b.disabled = processing);
+        this.renderSlot();
         button.setAttribute("aria-busy", String(processing));
     }
 
@@ -252,7 +270,7 @@ export class CommandPanel {
         assign.hidden = !empty;
         assign.disabled = !available || this.selectedTool !== toolId;
         const title = this.element.querySelector<HTMLButtonElement>("[data-slot-title]")!;
-        title.textContent = inspected ? this.floorNames[floor.id] || `Level ${floor.level}` : "Select a level";
+        title.textContent = inspected ? this.floorNames[floor.id] || (floor.level === 0 ? "Dumpster" : floor.name) : "Select a level";
         title.disabled = !inspected || !state.established || floor.level < 0;
         title.title = title.disabled ? "" : "Click to rename this level";
         title.setAttribute("aria-label", title.disabled ? "Select a level" : `${title.textContent}. Click to rename.`);
@@ -310,24 +328,35 @@ export class CommandPanel {
         this.element.querySelector<HTMLElement>(".wm-logo-placeholder")!.hidden = !!business.logoDataUrl;
     }
 
-    /** Data comes from the wallet/market/ranking adapters. Never substitute the stake for wallet balance. */
+    /** Legacy overview remains compatible; wallet balances are never treasury balances. */
     setOverview(data: PanelOverview): void {
-        const price = data.priceUsd;
-        this.element.querySelector("[data-price]")!.textContent = price !== null && Number.isFinite(price) && price >= 0
-            ? new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2, maximumFractionDigits: 10 }).format(price) : "—";
-        const change = this.element.querySelector<HTMLElement>("[data-change]")!;
-        const percent = data.change24hPercent;
-        const validChange = percent !== null && Number.isFinite(percent);
-        change.textContent = validChange ? `${percent > 0 ? "+" : ""}${percent.toFixed(2)}% · 24H` : "24H —";
-        change.dataset.direction = validChange ? (percent > 0 ? "up" : percent < 0 ? "down" : "flat") : "unknown";
-        const balance = data.walletBalanceWM;
-        const validBalance = data.walletConnected && balance !== null && /^\d+(\.\d+)?$/.test(balance);
-        this.element.querySelector("[data-wallet]")!.textContent = validBalance
-            ? balance.split(".").map((part, index) => index === 0 ? part.replace(/\B(?=(\d{3})+(?!\d))/g, ",") : part).join(".") : "—";
-        this.element.querySelector("[data-wallet-status]")!.textContent = data.walletConnected
-            ? validBalance ? "Available in wallet" : "Balance unavailable" : "Wallet not connected";
         const rank = data.rank;
         this.element.querySelector("[data-rank]")!.textContent = rank !== null && Number.isInteger(rank) && rank > 0 ? `#${rank.toLocaleString("en-US")}` : "—";
+    }
+
+    private renderBalances(): void {
+        const format = (value: string | null | undefined, unit: string) => {
+            if (value == null || !/^\d+(\.\d+)?$/.test(value)) return `— ${unit}`;
+            const [whole, fraction] = value.split(".");
+            return whole.replace(/\B(?=(\d{3})+(?!\d))/g, ",") + (fraction ? "." + fraction : "") + ` ${unit}`;
+        };
+        const snapshot = this.treasurySnapshot;
+        const preview = !snapshot && this.recyclerState.established;
+        this.element.querySelector("[data-staked]")!.textContent = format(snapshot ? snapshot.stakedWM : preview ? this.expansionUnlocked ? "200000" : "100000" : null, "WM");
+        this.element.querySelector("[data-stake-mode]")!.textContent = preview ? "SIMULATED STAKE" : "";
+        this.element.querySelector("[data-treasury-gor]")!.textContent = format(snapshot?.assets.find(a => a.id === "GOR")?.corporateBalance, "GOR");
+        this.element.querySelector("[data-net-value]")!.textContent = format(snapshot?.netValueGOR, "GOR");
+    }
+
+    private renderExpansion(): void {
+        const button = this.element.querySelector<HTMLButtonElement>("[data-stake-next-level]")!;
+        button.disabled = this.toolProcessing || !this.recyclerState.established || !this.expansionEligible || this.expansionUnlocked;
+        const state = this.recyclerState;
+        this.element.querySelector("[data-unlock-help]")!.textContent = this.expansionUnlocked
+            ? "Level 1 unlocked. Requirements for the next floor are not available yet."
+            : !state.established ? "Establish your business to unlock the Dumpster."
+            : this.expansionEligible ? "Requirements met · Stake another 100,000 WM to unlock Level 1. Simulated; no WM moves."
+            : `Recycle ${state.target} accounts in the Dumpster to unlock Level 1 (${state.recycled}/${state.target}). Then stake another 100,000 WM in this preview.`;
     }
 
     /** Supply unlocked slots only; this navigator does not invent or unlock floors. */
@@ -339,21 +368,18 @@ export class CommandPanel {
         }).sort((a, b) => b.level - a.level);
         const stack = this.element.querySelector<HTMLElement>(".wm-floor-stack")!;
         stack.replaceChildren();
-        for (let level = 9; level >= 0; level--) {
-            const floor = this.floors.find(f => f.level === level);
+        for (const floor of this.floors.filter(f => f.level >= 0)) {
             const button = document.createElement("button");
             button.type = "button";
             button.className = "wm-tower-floor";
-            button.disabled = !floor || this.toolProcessing;
-            if (floor) button.dataset.floor = floor.id;
+            button.disabled = this.toolProcessing;
+            button.dataset.floor = floor.id;
             const number = document.createElement("span");
-            number.className = "wm-floor-number"; number.textContent = String(level);
+            number.className = "wm-floor-number"; number.textContent = String(floor.level);
             const label = document.createElement("strong");
-            label.textContent = floor && this.floorNames[floor.id] ? this.floorNames[floor.id] : `Level ${level}`;
-            const state = document.createElement("span");
-            state.className = "wm-floor-lock"; state.textContent = floor ? "" : "Locked";
-            button.setAttribute("aria-label", `Level ${level}${floor ? this.floorNames[floor.id] ? ": " + this.floorNames[floor.id] : ", unlocked" : ", locked"}`);
-            button.append(number, label, state); stack.append(button);
+            label.textContent = this.floorNames[floor.id] || (floor.level === 0 ? "Dumpster" : floor.name);
+            button.setAttribute("aria-label", `${label.textContent}, unlocked`);
+            button.append(number, label); stack.append(button);
         }
         const count = this.floors.filter(floor => floor.level >= 0).length;
         this.element.querySelector("[data-floor-count]")!.textContent = count ? `${count} FLOOR${count === 1 ? "" : "S"}` : "THE ALLEY";
@@ -362,6 +388,7 @@ export class CommandPanel {
 
     setActiveFloor(id: string): void {
         this.activeFloor = id;
+        this.inspectedFloor = id;
         this.element.querySelectorAll<HTMLButtonElement>("[data-floor]").forEach(button => {
             button.setAttribute("aria-pressed", String(button.dataset.floor === id));
         });
@@ -387,7 +414,23 @@ export class CommandPanel {
         }
     }
 
+    /** Feed only verified treasury balances; wallet balances stay separate. */
+    setTreasury(data: TreasurySnapshot): void {
+        this.treasurySnapshot = data;
+        this.treasury.setData(data);
+        this.renderBalances();
+    }
+
+    private closeTreasury(): void {
+        delete this.element.dataset.corporateOpen;
+        this.treasury.element.hidden = true;
+        const button = this.element.querySelector<HTMLButtonElement>("[data-open-treasury]")!;
+        button.setAttribute("aria-expanded", "false");
+        button.focus();
+    }
+
     destroy(): void {
+        this.treasury.destroy();
         this.abort.abort();
         this.element.remove();
         this.shell.classList.remove("wm-in-game");

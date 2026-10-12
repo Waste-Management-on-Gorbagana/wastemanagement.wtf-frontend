@@ -205,7 +205,8 @@ export default class Level extends Phaser.Scene {
 		});
 	}
 
-private showComingSoon(): void {
+// Retained as a callable scene action for editor/event integrations.
+showComingSoon(): void {
 	// Prevent multiple popups.
 	if (this.children.getByName("comingSoonModal")) return;
 

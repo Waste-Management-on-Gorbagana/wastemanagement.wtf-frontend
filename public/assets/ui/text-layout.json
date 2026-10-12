@@ -1,0 +1,170 @@
+[
+  {
+    "x": 190,
+    "y": 300,
+    "width": 480,
+    "height": 60,
+    "text": "SSSS",
+    "style": "name"
+  },
+  {
+    "x": 161,
+    "y": 440,
+    "width": 240,
+    "height": 42,
+    "text": "CLAIM REWARDS",
+    "style": "button"
+  },
+  {
+    "x": 445,
+    "y": 440,
+    "width": 252,
+    "height": 42,
+    "text": "CORPORATE TREASURY",
+    "style": "button"
+  },
+  {
+    "x": 180,
+    "y": 545,
+    "width": 200,
+    "height": 30,
+    "text": "STAKED WM",
+    "style": "label"
+  },
+  {
+    "x": 482,
+    "y": 545,
+    "width": 205,
+    "height": 30,
+    "text": "TREASURY GOR",
+    "style": "label"
+  },
+  {
+    "x": 150,
+    "y": 597,
+    "width": 245,
+    "height": 50,
+    "text": "\u2014 WM",
+    "style": "value"
+  },
+  {
+    "x": 451,
+    "y": 597,
+    "width": 245,
+    "height": 50,
+    "text": "\u2014 GOR",
+    "style": "value"
+  },
+  {
+    "x": 180,
+    "y": 708,
+    "width": 470,
+    "height": 32,
+    "text": "CORPORATION NET VALUE",
+    "style": "label"
+  },
+  {
+    "x": 160,
+    "y": 752,
+    "width": 520,
+    "height": 44,
+    "text": "\u2014 GOR",
+    "style": "value"
+  },
+  {
+    "x": 130,
+    "y": 847,
+    "width": 170,
+    "height": 36,
+    "text": "RANK \u2014",
+    "style": "button"
+  },
+  {
+    "x": 323,
+    "y": 846,
+    "width": 192,
+    "height": 36,
+    "text": "LEADERBOARD",
+    "style": "button"
+  },
+  {
+    "x": 529,
+    "y": 846,
+    "width": 184,
+    "height": 36,
+    "text": "MARKETPLACE",
+    "style": "button"
+  },
+  {
+    "x": 183,
+    "y": 978,
+    "width": 470,
+    "height": 36,
+    "text": "UNLOCK NEW FLOOR",
+    "style": "disabled"
+  },
+  {
+    "x": 145,
+    "y": 1056,
+    "width": 549,
+    "height": 28,
+    "text": "Complete Dumpster requirements to unlock Level 1.",
+    "style": "help"
+  },
+  {
+    "x": 159,
+    "y": 1124,
+    "width": 445,
+    "height": 39,
+    "text": "0   Dumpster",
+    "style": "floor"
+  },
+  {
+    "x": 185,
+    "y": 1270,
+    "width": 450,
+    "height": 44,
+    "text": "Dumpster",
+    "style": "name"
+  },
+  {
+    "x": 400,
+    "y": 1442,
+    "width": 273,
+    "height": 40,
+    "text": "TRASH RECYCLER",
+    "style": "button"
+  },
+  {
+    "x": 403,
+    "y": 1490,
+    "width": 267,
+    "height": 44,
+    "text": "Reclaim rent from unused accounts",
+    "style": "help"
+  },
+  {
+    "x": 210,
+    "y": 1641,
+    "width": 410,
+    "height": 36,
+    "text": "Assign/Unassign",
+    "style": "disabled"
+  },
+  {
+    "x": 161,
+    "y": 1730,
+    "width": 500,
+    "height": 70,
+    "text": "Choose a tool to install in this level. Any recycling progress is kept when a tool is unassigned.",
+    "style": "help"
+  },
+  {
+    "x": 161,
+    "y": 1801,
+    "width": 500,
+    "height": 28,
+    "text": "SESSION PREVIEW \u00b7 No WM moves or rent is reclaimed.",
+    "style": "help"
+  }
+]
