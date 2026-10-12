@@ -17,7 +17,7 @@
 .wm-command.wm-command .wm-market-cell:nth-child(2) {background-image:url('/assets/ui/wm-retro-neon/display-treasury.png');}
 .wm-command.wm-command .wm-market-cell.wm-net-value {grid-column:1/-1;min-height:74px;background-image:url('/assets/ui/wm-retro-neon/display-net-value.png');}
 .wm-command.wm-command .wm-data-label {font:bold 11px/1.3 'Arial Narrow',Arial,sans-serif;color:#f2e5c5;letter-spacing:0;}
-.wm-command.wm-command .wm-market-cell .wm-data-label {padding-left:12px;}
+.wm-command.wm-command .wm-market-cell .wm-data-label {padding-left:24px;}
 .wm-command.wm-command .wm-market-cell strong {font:bold 20px/1.2 monospace;margin:10px 0 3px;text-align:center;color:#f2e5c5;overflow-wrap:anywhere;}
 .wm-command.wm-command .wm-market-cell small {font:9px Arial,sans-serif;text-align:center;color:#b8ab8b;}
 .wm-command.wm-command .wm-rank-row {display:grid;grid-template-columns:1fr 2fr;gap:5px;padding:0;border:0;background:none;}
