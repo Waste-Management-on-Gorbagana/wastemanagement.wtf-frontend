@@ -92,9 +92,7 @@ export default class Game extends Phaser.Scene {
                 : hostRect.right;
             const clearWidth = Math.max(1, Math.min(cssWidth, rightEdge - hostRect.left));
             const availableWidth = this.scale.width * clearWidth / cssWidth;
-            const base = stacked
-                ? Math.min(availableWidth / worldWidth, this.scale.height / worldHeight)
-                : Math.max(availableWidth / worldWidth, this.scale.height / worldHeight);
+            const base = Math.max(availableWidth / worldWidth, this.scale.height / worldHeight);
             const viewWidth = availableWidth;
             const viewHeight = this.scale.height;
             const viewX = 0;
