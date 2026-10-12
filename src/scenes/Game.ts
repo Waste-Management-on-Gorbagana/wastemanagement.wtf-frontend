@@ -61,21 +61,58 @@ export default class Game extends Phaser.Scene {
         const camera = this.cameras.main;
         camera.setBackgroundColor("#101815");
         let zoomFactor = 1;
-        let fitWholeAlley = false;
+        // Decorative underlay is separate from the interactive world camera.
+        const host = ensureGameShell().querySelector<HTMLElement>("#game-container")!;
+        const backdrop = document.createElement("div");
+        backdrop.setAttribute("aria-hidden", "true");
+        Object.assign(backdrop.style, {
+            position: "absolute", inset: "-12px", pointerEvents: "none",
+            backgroundPosition: "center", backgroundSize: "cover",
+            filter: "blur(8px) brightness(0.6)", zIndex: "0"
+        });
+        host.prepend(backdrop);
+        const canvas = this.game.canvas;
+        const originalClip = canvas.style.clipPath;
+        const originalPosition = canvas.style.position;
+        const originalZ = canvas.style.zIndex;
+        canvas.style.position = "relative";
+        canvas.style.zIndex = "1";
         let centreX = worldWidth / 2, centreY = worldHeight / 2;
         const applyCamera = () => {
-            const base = (fitWholeAlley ? Math.min : Math.max)(this.scale.width / worldWidth, this.scale.height / worldHeight);
+            const hostRect = host.getBoundingClientRect();
+            const panelRect = ensureGameShell().querySelector<HTMLElement>(".wm-command")?.getBoundingClientRect();
+            const cssWidth = Math.max(1, hostRect.width);
+            // Continue the crisp scene under the opaque inner frame, past the
+            // PNG's transparent left gutter, so no blurred seam sits beside it.
+            const brandRect = ensureGameShell().querySelector<HTMLElement>(".wm-brand-header")?.getBoundingClientRect();
+            const solidEdge = brandRect && brandRect.width > 0 ? brandRect.left : undefined;
+            const stacked = getComputedStyle(host).getPropertyValue("--wm-stacked-layout").trim() == "1";
+            const rightEdge = !stacked && panelRect
+                ? (solidEdge ?? panelRect.left + panelRect.width * 0.16) + 8
+                : hostRect.right;
+            const clearWidth = Math.max(1, Math.min(cssWidth, rightEdge - hostRect.left));
+            const availableWidth = this.scale.width * clearWidth / cssWidth;
+            const base = stacked
+                ? Math.min(availableWidth / worldWidth, this.scale.height / worldHeight)
+                : Math.max(availableWidth / worldWidth, this.scale.height / worldHeight);
+            const viewWidth = availableWidth;
+            const viewHeight = this.scale.height;
+            const viewX = 0;
+            const viewY = 0;
+            camera.setViewport(viewX, viewY, viewWidth, viewHeight);
+            // Hide the renderer's empty margins, revealing the decorative underlay.
+            canvas.style.clipPath = `inset(${viewY / this.scale.height * 100}% ${(this.scale.width - viewX - viewWidth) / this.scale.width * 100}% ${(this.scale.height - viewY - viewHeight) / this.scale.height * 100}% ${viewX / this.scale.width * 100}%)`;
             const zoom = base * zoomFactor;
             camera.setZoom(zoom);
-            const halfW = this.scale.width / (2 * zoom), halfH = this.scale.height / (2 * zoom);
+            const halfW = viewWidth / (2 * zoom), halfH = viewHeight / (2 * zoom);
             const x = halfW >= worldWidth / 2 ? worldWidth / 2 : Phaser.Math.Clamp(centreX, halfW, worldWidth - halfW);
             const y = halfH >= worldHeight / 2 ? worldHeight / 2 : Phaser.Math.Clamp(centreY, halfH, worldHeight - halfH);
             camera.centerOn(x, y);
             panel.setCameraZoom(zoomFactor);
         };
         const changeView = (action: string) => {
-            if (action === "all") { fitWholeAlley = true; zoomFactor = 1; centreX = worldWidth / 2; centreY = worldHeight / 2; }
-            if (action === "recycler") { fitWholeAlley = false; zoomFactor = 1.3; centreX = worldWidth * .40; centreY = worldHeight * .70; }
+            if (action === "all") { zoomFactor = 1; centreX = worldWidth / 2; centreY = worldHeight / 2; }
+            if (action === "recycler") { zoomFactor = 1.3; centreX = worldWidth * .40; centreY = worldHeight * .70; }
             if (action === "in") zoomFactor = Math.min(3, zoomFactor + .2);
             if (action === "out") zoomFactor = Math.max(1, zoomFactor - .2);
             applyCamera();
@@ -90,6 +127,7 @@ export default class Game extends Phaser.Scene {
         let selectedLevel = 0;
         const updateRecycler = () => {
             const backgroundKey = selectedLevel === 1 ? (progress.sovereignBuilt ? "wm-level-1-sovereign" : "wm-level-1-workshop") : progress.built ? "wm-alley-recycler-upgraded" : progress.established ? "wm-alley-recycler-installed" : "wm-starting-alley-branded";
+            backdrop.style.backgroundImage = `url("assets/backgrounds/${backgroundKey}.png")`;
             if (background && this.textures.exists(backgroundKey)) {
                 background.setTexture(backgroundKey, "__BASE").setDisplaySize(worldWidth, worldHeight);
             }
@@ -107,7 +145,6 @@ export default class Game extends Phaser.Scene {
             if (recycler?.isProcessing) return;
             selectedLevel = floor.level === 1 ? 1 : 0;
             zoomFactor = 1; centreX = worldWidth / 2; centreY = worldHeight / 2;
-            fitWholeAlley = false;
             updateRecycler(); applyCamera();
         }, toolId => {
             if (recycler?.isProcessing) return;
@@ -155,7 +192,7 @@ export default class Game extends Phaser.Scene {
             });
         };
 
-        const host = ensureGameShell().querySelector<HTMLElement>("#game-container")!;
+
         let pendingFrame = 0;
         const fit = () => {
             const width = Math.max(1, Math.floor(host.clientWidth));
@@ -174,6 +211,10 @@ export default class Game extends Phaser.Scene {
         };
         const observer = new ResizeObserver(scheduleFit);
         observer.observe(host);
+        document.addEventListener("fullscreenchange", scheduleFit);
+        window.addEventListener("resize", scheduleFit);
+        const panelElement = ensureGameShell().querySelector<HTMLElement>(".wm-command");
+        if (panelElement) observer.observe(panelElement);
         fit();
 
         const wheel = (pointer: Phaser.Input.Pointer, _objects: unknown[], _dx: number, dy: number) => {
@@ -185,6 +226,13 @@ export default class Game extends Phaser.Scene {
         this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
             this.input.off("wheel", wheel);
             observer.disconnect();
+            document.removeEventListener("fullscreenchange", scheduleFit);
+            window.removeEventListener("resize", scheduleFit);
+            backdrop.remove();
+            canvas.style.clipPath = originalClip;
+            canvas.style.position = originalPosition;
+            canvas.style.zIndex = originalZ;
+            camera.setViewport(0, 0, this.scale.width, this.scale.height);
             cancelAnimationFrame(pendingFrame);
             setup?.destroy();
             restoreSetupInput();

@@ -99,3 +99,43 @@
 @media(max-width:600px) {
     .wm-shell.wm-in-game {--wm-panel-width:min(68vw,340px);}
 }
+
+/* Mobile: full scene first, followed by the complete scrollable command panel. */
+@media (max-width:900px), (pointer:coarse) and (max-width:1100px) {
+    .wm-shell.wm-in-game {
+        display:block;
+        overflow-x:hidden;
+        overflow-y:auto;
+        -webkit-overflow-scrolling:touch;
+        padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px);
+    }
+    .wm-shell.wm-in-game > #game-container {
+        --wm-stacked-layout:1;
+        position:relative;
+        inset:auto;
+        width:100%;
+        height:auto;
+        aspect-ratio:1670 / 942;
+        flex:none;
+        overflow:hidden;
+    }
+    .wm-shell.wm-in-game > #game-container canvas { touch-action:pan-y; }
+    .wm-shell.wm-in-game > .wm-command {
+        position:relative;
+        inset:auto;
+        width:100%;
+        height:auto;
+        max-height:none;
+        overflow:visible;
+        overscroll-behavior:auto;
+    }
+    .wm-command.wm-command .wm-console-body,
+    .wm-command.wm-command .wm-corporate { min-height:0; }
+    .wm-command.wm-command .wm-market-cell strong { font-size:20px; }
+    .wm-command.wm-command .wm-data-label { font-size:12px; }
+    .wm-command.wm-command .wm-rewards-row button { font-size:13px;min-height:54px; }
+    .wm-command.wm-command .wm-recycler-controls p,
+    .wm-command.wm-command [data-unlock-help] { font-size:13px; }
+    .wm-command.wm-command .wm-tool-option small,
+    .wm-command.wm-command .wm-installed-tool span { font-size:12px; }
+}
