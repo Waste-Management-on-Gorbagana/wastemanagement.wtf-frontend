@@ -60,7 +60,7 @@ export class CommandPanel {
     private expansionUnlocked = false;
     private sovereignBuilt = false;
     private selectedTool: string | null = null;
-    private recyclerState = { established: false, built: false, recycled: 0, target: 100 };
+    private recyclerState = { established: false, built: false, recycled: 0, target: 5 };
 
     constructor(business: BusinessPreview | null = null, private readonly onFloorSelect: (floor: TowerFloor) => void = () => {}, private readonly onAssignTool: (toolId: string) => void = () => {}, private readonly onView: (action: string) => void = () => {}, private readonly onUnassignTool: () => void = () => {}, private readonly onStakeNextLevel: () => void = () => {}) {
         this.element.className = "wm-command";
@@ -91,7 +91,7 @@ export class CommandPanel {
                     <div class="wm-tower-ground" aria-hidden="true"></div>
                 </div>
                 <div class="wm-level-details">
-                <div class="wm-recycling-meter" hidden><div><strong>ACCOUNTS RECYCLED</strong><span data-recycle-count>0 / 100</span></div><progress data-recycle-meter max="100" value="0" aria-label="Accounts recycled"></progress></div>
+                <div class="wm-recycling-meter" hidden><div><strong>ACCOUNTS RECYCLED</strong><span data-recycle-count>0 / 5</span></div><progress data-recycle-meter max="5" value="0" aria-label="Accounts recycled"></progress></div>
                 <div class="wm-recycler-controls">
                     <h3 class="wm-editable-level-title"><button type="button" data-slot-title disabled>Select a level</button><input data-level-name-edit aria-label="Level name" maxlength="32" autocomplete="off" hidden></h3>
                     <span class="wm-name-announcement" data-floor-name-status aria-live="polite"></span>

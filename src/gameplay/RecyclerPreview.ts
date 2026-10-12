@@ -20,7 +20,7 @@ export class RecyclerProgress {
         return true;
     }
     readonly recycled = new Set<number>();
-    readonly nextLevelAccountRequirement = 100;
+    readonly nextLevelAccountRequirement = 5;
     private level1StakeCompleted = false;
     readonly nextLevelStakeWM = 100_000;
     get nextLevelEligible(): boolean { return this.established && this.recycled.size >= this.nextLevelAccountRequirement; }
