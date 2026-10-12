@@ -88,44 +88,46 @@ export class BusinessSetup {
     }
 
     private render(): void {
-        const titles = ["Name your business.", "Make your mark.", this.editing ? "Review your brand." : "Stake to open shop."];
+        const titles = ["Give your trash a name.", "Trash brand.", this.editing ? "Review your setup." : "Review & stake."];
+        this.dialog.dataset.step = String(this.step);
         const descriptions = [
-            "Every empire of trash starts with a name.",
-            "Upload your brand image. It will also be the image used by your business NFT.",
-            this.editing ? "Save your branding changes. No additional stake is required." : "Establishing a business requires a stake of " + BUSINESS_STAKE_LABEL + "."
+            "",
+            "Upload the image for your company and business NFT.",
+            this.editing ? "Check your changes before saving." : ""
         ];
         this.dialog.innerHTML = `
             <form novalidate>
-                <div class="wm-setup-top"><span>WM / BUSINESS REGISTRATION</span><button type="button" data-action="cancel" aria-label="Close business setup">×</button></div>
+                <div class="wm-setup-top"><span>WM / REGISTRATION</span><button type="button" data-action="cancel" aria-label="Close business setup">×</button></div>
                 <ol class="wm-setup-steps" aria-label="Registration progress">
-                    ${["NAME", "BRAND", this.editing ? "REVIEW" : "REVIEW & STAKE"].map((label, i) => `<li ${i === this.step ? 'aria-current="step"' : ""}><span>${i + 1}</span>${label}</li>`).join("")}
+                    ${["NAME", "SETUP", this.editing ? "REVIEW" : "REVIEW & STAKE"].map((label, i) => `<li ${i === this.step ? 'aria-current="step"' : ""}><span>${i + 1}</span>${label}</li>`).join("")}
                 </ol>
-                <div class="wm-setup-heading"><p class="wm-eyebrow">ESTABLISH YOUR BUSINESS</p><h1 id="wm-setup-title" tabindex="-1">${titles[this.step]}</h1><p>${descriptions[this.step]}</p></div>
+                <div class="wm-setup-heading"><h1 id="wm-setup-title" tabindex="-1">${titles[this.step]}</h1>${descriptions[this.step] ? `<p>${descriptions[this.step]}</p>` : ""}</div>
                 <div class="wm-setup-body">
                     <div class="wm-setup-fields">
                         ${this.step === 0 ? `
-                            <label class="wm-field-label" for="wm-business-name">BUSINESS NAME</label>
+                            <label class="wm-field-label wm-visually-hidden" for="wm-business-name">Business name</label>
                             <input id="wm-business-name" name="business-name" type="text" maxlength="64" autocomplete="organization" placeholder="Your business name" aria-describedby="wm-name-hint wm-setup-error">
-                            <p id="wm-name-hint" class="wm-field-hint">2–32 characters. You can refine your branding in the next step.</p>
+                            <p id="wm-name-hint" class="wm-field-hint">2–32 characters.</p>
                         ` : ""}
                         ${this.step === 1 ? `
-                            <p class="wm-eyebrow">BRAND IMAGE UPLOAD · V4</p>
-                            <label class="wm-field-label" for="wm-brand-image">YOUR BRAND IMAGE</label>
+                            
+                            <label class="wm-field-label" for="wm-brand-image">Brand image</label>
                             <input id="wm-brand-image" name="brand-image" type="file" accept="image/png,image/jpeg,image/webp" aria-describedby="wm-image-hint wm-setup-error">
-                            <p id="wm-image-hint" class="wm-field-hint">PNG, JPG or WebP · Up to 2 MB · Maximum 4096 × 4096 pixels. Transparent PNGs work well for logos.</p>
+                            <p id="wm-image-hint" class="wm-field-hint">PNG, JPG or WebP · Up to 2 MB · Maximum 4096 × 4096.</p>
                             <p class="wm-upload-status" data-upload-status role="status"></p>
-                            <p class="wm-field-hint">Your artwork is kept as uploaded, with no recolouring or cropping. Choose another file to replace it.</p>
+                            
                         ` : ""}
                         ${this.step === 2 ? `
-                            <dl class="wm-review-list"><div><dt>BUSINESS NAME</dt><dd data-review-name></dd></div><div><dt>BRAND IMAGE / NFT IMAGE</dt><dd data-review-image></dd></div><div><dt>STARTING PROPERTY</dt><dd>Level 1 slot unlocked · Assign Trash Recycler</dd></div><div><dt>REQUIRED BUSINESS STAKE</dt><dd>${BUSINESS_STAKE_LABEL}</dd></div><div><dt>OWNERSHIP</dt><dd>Local preview · No NFT minted</dd></div></dl>
-                            <div class="wm-stake-terms"><strong>THE STAKE STAYS WITH THE BUSINESS</strong><p><b>Sell the business NFT:</b> the business, assets, progress, locked stake and withdrawal rights transfer to the buyer.</p><p><b>Withdraw the stake:</b> return the staked WM, burn the business NFT and close the business together in one transaction.</p></div>
+                            <div class="wm-stake-summary"><span class="wm-field-label">${this.editing ? "EXISTING BUSINESS STAKE" : "REQUIRED STAKE"}</span><strong>${BUSINESS_STAKE_LABEL}</strong><p>${this.editing ? "No additional stake required." : "Unlocks Level 0."}</p></div>
+                            <details class="wm-stake-terms"><summary>How the stake works</summary><p>The stake stays with the business. Selling its NFT transfers the business and stake to the buyer.</p><p>Withdrawing returns the stake, burns the business NFT and closes the business.</p></details>
+
                         ` : ""}
                     </div>
-                    <div class="wm-sign-preview"><span class="wm-sign-caption">YOUR COMPANY SIGN</span><div class="wm-company-sign"><img class="wm-company-logo" alt="Uploaded business brand" hidden><span class="wm-logo-empty">YOUR BRAND IMAGE</span><strong class="wm-company-name"></strong><small>EST. IN THE ALLEY</small></div><span class="wm-sign-caption">BRAND PREVIEW</span></div>
+                    <div class="wm-sign-preview" ${this.step !== 2 ? "hidden" : ""}><span class="wm-sign-caption">NFT preview</span><div class="wm-company-sign"><img class="wm-company-logo" alt="Uploaded business brand" hidden><span class="wm-logo-empty">YOUR BRAND IMAGE</span><strong class="wm-company-name"></strong></div></div>
                 </div>
                 <p id="wm-setup-error" class="wm-setup-error" role="alert"></p>
-                <div id="wm-setup-notice" class="wm-setup-notice"><strong>LOCAL PREVIEW</strong> This action is simulated and saved only in this browser. No WM is staked or moved. No wallet check, NFT mint, burn, sale, or transaction occurs. Your image is stored locally; metadata publishing is not connected.</div>
-                <div class="wm-setup-actions"><button type="button" class="wm-setup-back" data-action="${this.step === 0 ? "cancel" : "back"}">${this.step === 0 ? "Back to welcome" : "← Back"}</button><button type="submit" class="wm-setup-next">${this.step === 2 ? (this.editing ? "Save preview changes →" : `<span class="wm-simulated-label">SIMULATED · PREVIEW ONLY</span>Stake ${BUSINESS_STAKE_LABEL} &amp; Establish Business`) : "Continue →"}</button></div>
+                <div id="wm-setup-notice" class="wm-setup-notice"><strong>PREVIEW MODE</strong> Saved in this browser only. No WM moves and no NFT is minted.</div>
+                <div class="wm-setup-actions"><button type="button" class="wm-setup-back" data-action="${this.step === 0 ? "cancel" : "back"}">${this.step === 0 ? "Back to welcome" : "← Back"}</button><button type="submit" class="wm-setup-next">${this.step === 2 ? (this.editing ? "Save preview changes →" : `<span class="wm-simulated-label">SIMULATED · NO WM MOVES</span>Incorporate`) : "Continue →"}</button></div>
             </form>
         `;
         const nameInput = this.dialog.querySelector<HTMLInputElement>('[name="business-name"]');

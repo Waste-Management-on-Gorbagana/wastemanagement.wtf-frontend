@@ -32,6 +32,9 @@ export default class Game extends Phaser.Scene {
 	/* START-USER-CODE */
 
     preload(): void {
+        for (const key of ["wm-level-1-workshop", "wm-level-1-sovereign"]) {
+            if (!this.textures.exists(key)) this.load.image(key, `assets/backgrounds/${key}.png`);
+        }
         for (const key of ["recycler-intake", "recycler-grind", "recycler-finish"]) {
             if (!this.cache.audio.exists(key)) this.load.audio(key, "assets/audio/" + key + ".wav");
         }
@@ -84,27 +87,41 @@ export default class Game extends Phaser.Scene {
         const progress = new RecyclerProgress();
         if (business?.logoDataUrl) progress.establish();
         let recycler: RecyclerWorld | undefined;
+        let selectedLevel = 0;
         const updateRecycler = () => {
-            const backgroundKey = progress.built ? "wm-alley-recycler-upgraded" : progress.established ? "wm-alley-recycler-installed" : "wm-starting-alley-branded";
+            const backgroundKey = selectedLevel === 1 ? (progress.sovereignBuilt ? "wm-level-1-sovereign" : "wm-level-1-workshop") : progress.built ? "wm-alley-recycler-upgraded" : progress.established ? "wm-alley-recycler-installed" : "wm-starting-alley-branded";
             if (background && this.textures.exists(backgroundKey)) {
                 background.setTexture(backgroundKey, "__BASE").setDisplaySize(worldWidth, worldHeight);
             }
+            recycler?.setActive(selectedLevel === 0);
+            panel.setSovereign(progress.sovereignBuilt);
             panel.setToolProcessing(recycler?.isProcessing ?? false);
+            panel.setExpansion(progress.nextLevelEligible, progress.nextLevelUnlocked);
             panel.setRecycler(progress.established, progress.built, progress.recycled.size, progress.nextLevelAccountRequirement);
-            const floors = [{ id: progress.established ? "slot-1" : "alley", name: progress.established ? "1 · Dumpster" : "The Alley", level: progress.established ? 1 : 0, x: worldWidth * .30, y: worldHeight * .72 }];
-            if (progress.nextLevelUnlocked) floors.push({ id: "slot-2", name: "2 · Empty slot", level: 2, x: worldWidth * .5, y: worldHeight * .3 });
+            const floors = [{ id: progress.established ? "slot-1" : "alley", name: progress.established ? "Level 0" : "The Alley", level: progress.established ? 0 : -1, x: worldWidth * .30, y: worldHeight * .72 }];
+            if (progress.nextLevelUnlocked) floors.push({ id: "slot-2", name: "Level 1", level: 1, x: worldWidth * .5, y: worldHeight * .3 });
             panel.setFloors(floors);
             recycler?.refresh();
         };
         const panel = new CommandPanel(business, floor => {
-            if (floor.id === "slot-1") changeView("recycler");
-            else if (floor.id === "alley") changeView("all");
-            else { centreX = floor.x; centreY = floor.y; zoomFactor = 1.8; applyCamera(); }
+            if (recycler?.isProcessing) return;
+            selectedLevel = floor.level === 1 ? 1 : 0;
+            zoomFactor = 1; centreX = worldWidth / 2; centreY = worldHeight / 2;
+            fitWholeAlley = false;
+            updateRecycler(); applyCamera();
         }, toolId => {
-            if (progress.assignTool(toolId)) { updateRecycler(); changeView("recycler"); }
+            if (recycler?.isProcessing) return;
+            const assigned = selectedLevel === 1 && toolId === "sovereign"
+                ? progress.assignSovereign()
+                : selectedLevel === 0 && toolId === "trash-recycler" && progress.assignTool(toolId);
+            if (assigned) { updateRecycler(); applyCamera(); }
         }, changeView, () => {
             if (recycler?.isProcessing) return;
-            if (progress.unassignTool()) updateRecycler();
+            const removed = selectedLevel === 1 ? progress.unassignSovereign() : progress.unassignTool();
+            if (removed) updateRecycler();
+        }, () => {
+            if (recycler?.isProcessing) return;
+            if (progress.simulateNextLevelStake()) updateRecycler();
         });
         recycler = new RecyclerWorld(this, progress, updateRecycler);
         recycler.setBrand(business?.logoDataUrl);

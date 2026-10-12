@@ -5,11 +5,32 @@ export const STARTER_TOOLS: readonly ToolDefinition[] = [
     { id: "trash-recycler", name: "Trash Recycler", building: "Dumpster" }
 ];
 export class RecyclerProgress {
-    readonly slot: LevelSlot = { level: 1, unlocked: false, toolId: null };
+    readonly slot: LevelSlot = { level: 0, unlocked: false, toolId: null };
     readonly availableTools: readonly ToolDefinition[] = STARTER_TOOLS;
+    private sovereignAssigned = false;
+    get sovereignBuilt(): boolean { return this.sovereignAssigned; }
+    assignSovereign(): boolean {
+        if (!this.nextLevelUnlocked || this.sovereignAssigned) return false;
+        this.sovereignAssigned = true;
+        return true;
+    }
+    unassignSovereign(): boolean {
+        if (!this.sovereignAssigned) return false;
+        this.sovereignAssigned = false;
+        return true;
+    }
     readonly recycled = new Set<number>();
     readonly nextLevelAccountRequirement = 100;
-    get nextLevelUnlocked(): boolean { return this.recycled.size >= this.nextLevelAccountRequirement; }
+    private level1StakeCompleted = false;
+    readonly nextLevelStakeWM = 100_000;
+    get nextLevelEligible(): boolean { return this.established && this.recycled.size >= this.nextLevelAccountRequirement; }
+    get nextLevelUnlocked(): boolean { return this.level1StakeCompleted; }
+    /** Session preview only. Production must unlock from verified transaction settlement. */
+    simulateNextLevelStake(): boolean {
+        if (!this.nextLevelEligible || this.level1StakeCompleted) return false;
+        this.level1StakeCompleted = true;
+        return true;
+    }
     get established(): boolean { return this.slot.unlocked; }
     get built(): boolean { return this.slot.toolId === "trash-recycler"; }
     establish(): void { this.slot.unlocked = true; }

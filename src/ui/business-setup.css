@@ -88,3 +88,174 @@
 .wm-setup-next:disabled { opacity: .5; cursor: wait; }
 @media (max-width: 900px) { .wm-business-logo { width: 25px; height: 25px; } }
 .wm-field-label { display: block; color: #c9d1bb; font: 10px monospace; letter-spacing: 1px; margin-bottom: 10px; }
+
+/* WM registration console — shares the existing in-game artwork. */
+.wm-setup {
+    --setup-ink:#f0dfbd; --setup-muted:#c3ae8a; --setup-edge:#846342;
+    width:min(900px,calc(100vw - 28px)); padding:14px;
+    color:var(--setup-ink); background:radial-gradient(ellipse at top,#382b1d,#17130f 75%);
+    border:18px solid transparent;
+    border-image:url('/assets/ui/console-frame.png') 170 160 170 160 / 18px / 0 stretch;
+    box-shadow:0 24px 90px #000d,inset 0 0 28px #000;
+    scrollbar-color:#947049 #191510;
+}
+.wm-setup::backdrop { background:#100b07b8; backdrop-filter:blur(3px); }
+.wm-setup-top { padding:0 8px 8px; border-bottom:2px ridge var(--setup-edge); color:var(--setup-muted); font-weight:bold; }
+.wm-setup-top button { color:#f5d4a0; border:1px solid #8e6843; border-radius:4px; background:linear-gradient(#443322,#221a12); width:38px; height:38px; }
+.wm-setup-steps { margin:18px 12px 0; gap:10px; flex-wrap:wrap; }
+.wm-setup-steps li { padding:7px 10px; border:1px solid #6f5337; border-radius:3px; background:#17130f; color:#baa685; font-weight:bold; }
+.wm-setup-steps li span { border-color:#937046; color:#d9bd8d; background:#30251a; border-radius:3px; }
+.wm-setup-steps [aria-current] { color:#ffe7b9; border-color:#bf8c4b; background:linear-gradient(#573a20,#2d2015); box-shadow:inset 0 -2px #d38b3e; }
+.wm-setup-steps [aria-current] span { color:#2b1c0d; background:#e5ad5c; border-color:#e5ad5c; }
+.wm-setup-heading { padding:20px 12px; }
+.wm-setup .wm-eyebrow { color:#dcb27b !important; letter-spacing:1.5px; }
+.wm-setup-heading h1 {
+    padding:20px 24px; min-height:80px; margin:0 0 12px;
+    background:url('/assets/ui/company-nameplate.png') center / 100% 145% no-repeat;
+    color:#2c2117; font-family:Impact,'Arial Narrow',Arial,sans-serif;
+    font-size:clamp(24px,3.4vw,36px); line-height:1.15; letter-spacing:.3px; text-transform:uppercase;
+}
+.wm-setup-heading p { color:var(--setup-muted); }
+.wm-setup-body { padding:0 12px; gap:20px; grid-template-columns:minmax(0,1.15fr) minmax(0,1fr); }
+.wm-setup-fields { min-width:0; padding:16px; border:2px ridge #806142; border-radius:5px; background:linear-gradient(135deg,#282017,#17130f); box-shadow:inset 0 0 18px #0006; }
+.wm-setup .wm-field-label { color:#e6c99c; font-weight:bold; }
+.wm-setup input[type="text"] { border:2px ridge #94714a; background:#100e0b; color:#fff0d1; box-shadow:inset 0 3px 9px #0009; border-radius:4px; }
+.wm-setup input[type="text"]::placeholder { color:#9c896e; }
+.wm-setup .wm-field-hint { color:var(--setup-muted); }
+.wm-setup .wm-sign-preview { padding:16px; border:4px ridge #987449; border-radius:6px; background:radial-gradient(ellipse at top,#493725,#16120e 80%); box-shadow:inset 0 0 22px #0009; justify-content:center; }
+.wm-setup .wm-sign-caption { color:#d1b488; }
+.wm-setup .wm-company-sign {
+    padding:22px 18px; gap:6px; min-height:218px;
+    border:0; border-radius:4px;
+    background:#bca077 url('/assets/ui/company-nameplate.png') center / 100% 100% no-repeat;
+    box-shadow:0 5px 14px #0008;
+}
+.wm-setup .wm-company-name { color:#2b2117; font-family:Impact,'Arial Narrow',Arial,sans-serif; text-transform:uppercase; font-size:24px; }
+.wm-setup .wm-company-sign small { color:#57412a; font-weight:bold; }
+.wm-setup .wm-company-logo { height:120px; }
+.wm-setup .wm-logo-empty { color:#675035; border:1px dashed #806445; background:#3124160a; border-radius:3px; }
+.wm-setup input[type="file"] { color:#d3bc97; line-height:1.5; }
+.wm-setup input[type="file"]::file-selector-button { border:2px ridge #987449; border-radius:4px; background:linear-gradient(#654328,#362719); color:#ffe3b2; font-weight:bold; }
+.wm-setup .wm-upload-status { color:#e9bd79; }
+.wm-setup .wm-review-list > div { border-bottom-color:#695038; }
+.wm-setup .wm-review-list dt { color:#c5a77b; }
+.wm-setup .wm-review-list dd { color:#f1dfbf; line-height:1.45; }
+.wm-setup .wm-stake-terms { border:2px ridge #795b3b; background:#18130e; }
+.wm-setup .wm-stake-terms > strong { color:#edbd79; }
+.wm-setup .wm-stake-terms p { color:#cbb99b; }
+.wm-setup .wm-stake-terms b { color:#f2ddba; }
+.wm-setup-error { margin:12px 12px 6px; color:#ffb294; }
+.wm-setup-notice { margin:0 12px 16px; border:1px solid #6f5131; border-left:3px solid #cf883b; background:#2b2116; color:#cbb99c; }
+.wm-setup-notice strong { color:#edbd79; }
+.wm-setup-actions { padding:16px 12px max(12px,env(safe-area-inset-bottom)); border-top:2px ridge #806142; background:linear-gradient(#241c14,#15110d); align-items:center; }
+.wm-setup-actions button { min-height:54px; border-radius:4px; }
+.wm-setup .wm-setup-back { color:#e5c9a0 !important; border:2px ridge #8a6640; background:linear-gradient(#3b2d20,#1f1811); }
+.wm-setup .wm-setup-next {
+    min-width:160px; padding:18px 24px; border:0;
+    color:#ffe5b9 !important; background:#8e461d url('/assets/ui/action-button.png') center / 100% 145% no-repeat;
+    font-family:'Arial Narrow',Arial,sans-serif; font-size:15px; text-shadow:0 1px 2px #41200c;
+}
+.wm-setup .wm-setup-next:hover { background-color:#a85220; filter:brightness(1.12); }
+.wm-setup button:focus-visible,.wm-setup input:focus-visible { outline:2px solid #ffd18a; outline-offset:3px; }
+.wm-setup .wm-setup-next:disabled { filter:grayscale(.6); opacity:.55; }
+@media (max-width:600px) {
+    .wm-setup { width:calc(100vw - 12px); max-height:calc(100dvh - 12px); padding:7px; border-width:12px; border-image-width:12px; }
+    .wm-setup-top { font-size:8px; letter-spacing:.5px; }
+    .wm-setup-steps { margin:12px 4px 0; gap:5px; }
+    .wm-setup-steps li { padding:5px; font-size:8px; gap:4px; letter-spacing:0; }
+    .wm-setup-heading { padding:16px 4px; }
+    .wm-setup-heading h1 { padding:18px; min-height:70px; }
+    .wm-setup-body { grid-template-columns:minmax(0,1fr); padding:0 4px; gap:12px; }
+    .wm-setup .wm-company-sign { min-height:170px; }
+    .wm-setup .wm-company-logo { height:90px; }
+    .wm-setup-notice,.wm-setup-error { margin-inline:4px; }
+    .wm-setup-actions { padding-inline:4px; gap:8px; }
+    .wm-setup .wm-setup-next { min-width:0; padding:15px 14px; font-size:12px; }
+}
+
+/* Dedicated registration artwork. Sliced frame preserves the corner hardware. */
+.wm-setup {
+    border-image-source:url('/assets/ui/registration/frame.png');
+    border-image-slice:225 220 205 220;
+    border-image-width:36px;
+    border-width:36px;
+    padding:8px;
+}
+.wm-setup-heading h1 {
+    background-image:url('/assets/ui/registration/header.png');
+    background-size:100% 155%; background-position:center 47%;
+    min-height:90px; padding:25px 30px;
+}
+.wm-setup .wm-setup-next {
+    background-image:url('/assets/ui/registration/action.png');
+    background-color:transparent; background-size:100% 145%;
+    background-position:center 48%; padding:20px 26px;
+}
+.wm-setup .wm-setup-next:hover { background-color:transparent; }
+.wm-setup input[type="text"] {
+    border:0; border-radius:0; box-shadow:none;
+    background:transparent url('/assets/ui/registration/input.png') center 40% / 100% 200% no-repeat;
+    padding:18px 26px; min-height:64px;
+}
+.wm-setup .wm-setup-back {
+    border:0; background:transparent url('/assets/ui/registration/input.png') center 40% / 100% 200% no-repeat;
+    padding:18px 22px;
+}
+.wm-setup input[type="file"]::file-selector-button {
+    border:0; background:transparent url('/assets/ui/registration/action.png') center 48% / 100% 145% no-repeat;
+    padding:16px 22px;
+}
+@media(max-width:600px) {
+    .wm-setup { border-width:22px; border-image-width:22px; padding:4px; }
+    .wm-setup-heading h1 { font-size:24px; min-height:80px; padding:23px 22px; }
+    .wm-setup .wm-setup-next { padding:18px 20px; }
+    .wm-setup .wm-setup-back { padding:16px 18px; }
+}
+
+/* Streamlined registration: one task per step; preview appears only at review. */
+.wm-setup [hidden] { display:none !important; }
+.wm-setup .wm-visually-hidden { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; border:0; }
+.wm-setup .wm-setup-heading h1 {
+    background:none; min-height:0; padding:0; margin:0 0 10px;
+    color:#f0dfbd; font-family:'Arial Narrow',Arial,sans-serif;
+    font-size:clamp(23px,3vw,30px); font-weight:700; text-transform:none; letter-spacing:0;
+}
+.wm-setup .wm-setup-heading { padding:24px 12px 18px; }
+.wm-setup[data-step="0"] .wm-setup-body,
+.wm-setup[data-step="1"] .wm-setup-body { grid-template-columns:minmax(0,1fr); }
+.wm-setup[data-step="0"] .wm-setup-fields,
+.wm-setup[data-step="1"] .wm-setup-fields { border:0; background:none; box-shadow:none; padding:0; }
+.wm-setup[data-step="0"],
+.wm-setup[data-step="1"] { width:min(680px,calc(100vw - 28px)); }
+.wm-setup[data-step="0"] .wm-setup-body { padding-bottom:8px; }
+.wm-setup .wm-setup-error:empty { min-height:0; margin-block:12px; }
+.wm-setup .wm-setup-notice { padding:10px 12px; font-size:11px; }
+.wm-setup .wm-setup-notice strong { display:inline; margin-right:8px; }
+.wm-setup .wm-stake-summary > strong { display:block; font:bold clamp(27px,4vw,36px) 'Arial Narrow',Arial,sans-serif; color:#f4cb89; margin:10px 0; }
+.wm-setup .wm-stake-summary p { color:#d6c1a0; font-size:13px; }
+.wm-setup .wm-stake-terms summary { color:#e5bc82; cursor:pointer; font:bold 12px Arial,sans-serif; }
+.wm-setup .wm-stake-terms[open] summary { margin-bottom:12px; }
+.wm-setup .wm-sign-preview { align-self:start; }
+.wm-setup .wm-company-sign { background:#201a13; border:2px ridge #8d6a43; padding:18px; min-height:210px; }
+.wm-setup .wm-company-name { color:#f1dfbf; }
+.wm-setup .wm-company-sign small { color:#c3a981; }
+.wm-setup .wm-logo-empty { color:#c3a981; }
+@media(max-width:600px) {
+    .wm-setup[data-step="0"],.wm-setup[data-step="1"] { width:calc(100vw - 12px); }
+    .wm-setup .wm-setup-heading { padding:18px 4px 14px; }
+}
+
+/* Keep the editable text inside the dark inset, clear of the asset's end caps. */
+.wm-setup input#wm-business-name {
+    height:64px; min-height:64px; line-height:24px;
+    padding:20px max(34px,6.5%);
+    background-position:center 50%;
+    font-size:16px;
+}
+
+/* Explicit inset keeps typing and placeholder clear of the illustrated end cap. */
+.wm-setup input#wm-business-name {
+    padding-left:56px !important;
+    padding-right:48px !important;
+    text-indent:0;
+}

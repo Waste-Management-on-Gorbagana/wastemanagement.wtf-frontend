@@ -11,6 +11,11 @@ export class RecyclerWorld {
     private readonly sparks: Phaser.GameObjects.Arc[] = [];
     private ghost?: Phaser.GameObjects.Image;
     private busy = false;
+    private active = true;
+    setActive(active: boolean): void {
+        this.active = active;
+        this.refresh();
+    }
     get isProcessing(): boolean { return this.busy; }
     private machineX = 0;
     private machineY = 0;
@@ -28,7 +33,7 @@ export class RecyclerWorld {
     constructor(private scene: Phaser.Scene, private state: RecyclerProgress, private changed: () => void) {
         this.audio = new RecyclerAudio(scene);
         this.nextSlot = scene.add.rectangle(0, 0, 180, 70, 0x17251b, .9).setStrokeStyle(2, 0xb2e63a).setDepth(30);
-        this.nextLabel = scene.add.text(0, 0, "LEVEL 2 UNLOCKED\nEmpty tool slot", { fontSize: "14px", align: "center", color: "#e8e9da" }).setOrigin(.5).setDepth(31);
+        this.nextLabel = scene.add.text(0, 0, "LEVEL 1 UNLOCKED\nEmpty tool slot", { fontSize: "14px", align: "center", color: "#e8e9da" }).setOrigin(.5).setDepth(31);
         // Keep the background texture intact. Processing effects use world coordinates.
         this.shadow = scene.add.ellipse(0, 0, 1, 1, 0x130c06, .55).setDepth(33);
         this.machine = scene.add.image(0, 0, "trash-recycler", "__BASE").setOrigin(.5).setDepth(34).setVisible(false);
@@ -74,22 +79,22 @@ export class RecyclerWorld {
         if (this.brand) {
             this.brand.setPosition(this.width * .333, this.height * .72);
             this.brand.setScale(Math.min(this.width * .084 / this.brand.width, this.height * .116 / this.brand.height));
-            this.brand.setVisible(this.state.established);
+            this.brand.setVisible(this.active && this.state.established);
         }
         if (this.flagBrand) {
             this.flagBrand.setPosition(this.width * .211, this.height * .228);
             this.flagBrand.setScale(Math.min(this.width * .047 / this.flagBrand.width, this.height * .08 / this.flagBrand.height));
-            this.flagBrand.setVisible(this.state.established);
+            this.flagBrand.setVisible(this.active && this.state.established);
         }
     }
     private drag = (_pointer: Phaser.Input.Pointer, object: Phaser.GameObjects.GameObject, x: number, y: number) => {
-        if (!this.state.built || this.busy || !this.trash.includes(object as Phaser.GameObjects.Image)) return;
+        if (!this.active || !this.state.built || this.busy || !this.trash.includes(object as Phaser.GameObjects.Image)) return;
         (object as Phaser.GameObjects.Image).setPosition(x, y).setDepth(38);
     };
     private drop = (pointer: Phaser.Input.Pointer, object: Phaser.GameObjects.GameObject) => {
         if (!this.trash.includes(object as Phaser.GameObjects.Image)) return;
         const world = this.scene.cameras.main.getWorldPoint(pointer.x, pointer.y);
-        if (!this.busy && this.state.built && this.bin.getBounds().contains(world.x, world.y)) {
+        if (this.active && !this.busy && this.state.built && this.bin.getBounds().contains(world.x, world.y)) {
             const item = object as Phaser.GameObjects.Image;
             const id = item.getData("trashId") as number;
             if (id < 100 && !this.state.recycled.has(id)) {
@@ -168,10 +173,10 @@ export class RecyclerWorld {
         if (!this.state.built && this.busy) this.stopProcessing();
         this.machine.setVisible(false);
         this.shadow.setVisible(false); // Grounding shadows are painted into the upgraded scene.
-        this.bin.setVisible(this.state.built);
+        this.bin.setVisible(this.active && this.state.built);
         this.layoutBrand();
-        this.nextSlot.setVisible(this.state.nextLevelUnlocked);
-        this.nextLabel.setVisible(this.state.nextLevelUnlocked);
+        this.nextSlot.setVisible(false);
+        this.nextLabel.setVisible(false);
         if (this.busy) return;
         // Refill each of the five visual positions with its next distinct mock account.
         this.trash.forEach((item, id) => {
@@ -179,7 +184,7 @@ export class RecyclerWorld {
             while (accountId < 100 && this.state.recycled.has(accountId)) accountId += 5;
             item.setDepth(32);
             item.setData("trashId", accountId);
-            item.setVisible(this.state.built && accountId < 100);
+            item.setVisible(this.active && this.state.built && accountId < 100);
             if (item.input) item.input.enabled = item.visible;
             item.setPosition(this.width * [ .12, .23, .36, .44, .51 ][id], this.height * [ .93, .91, .94, .87, .93 ][id]);
         });

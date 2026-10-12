@@ -90,3 +90,40 @@
 .wm-installed-tool span { color:#c6b28f; font-size:12px; }
 .wm-recycler-controls [data-unassign-tool] { color:#e7c99a; background:linear-gradient(#352a1d,#211a12); border:2px ridge #94744a; font-weight:bold; }
 .wm-recycler-controls button:focus-visible { outline:2px solid #ffd28a; outline-offset:3px; }
+
+/* Ten numbered floors; only unlocked floors can be selected and named. */
+.wm-command .wm-tower-window { aspect-ratio:auto; height:430px; max-height:none; }
+.wm-command .wm-floor-stack { display:flex; flex-direction:column; gap:4px; padding:10px; overflow-y:auto; background:#100d0980; }
+.wm-command .wm-tower-floor { position:static; width:100%; min-height:36px; flex:1 0 36px; grid-template-columns:25px minmax(0,1fr) auto; padding:5px 9px; }
+.wm-command .wm-tower-floor:disabled { opacity:1; color:#968269; background:#17130ec4; border-color:#4e3e2b; cursor:not-allowed; }
+.wm-command .wm-tower-floor:disabled strong { color:#ac9779; }
+.wm-command .wm-tower-floor strong { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.wm-floor-lock { font:10px Arial,sans-serif; color:#a59071; }
+.wm-floor-name-form { padding:10px; border:1px solid #735538; background:#1a150f; }
+.wm-floor-name-form label { display:block; margin-bottom:7px; color:#d9bd8d; font:12px Arial,sans-serif; }
+.wm-floor-name-form > div { display:flex; gap:7px; }
+.wm-floor-name-form input { width:100%; min-width:0; padding:9px; background:#100d09; border:1px solid #9b7547; color:#f5dfb7; font:14px Arial,sans-serif; }
+.wm-floor-name-form button { flex-shrink:0; }
+.wm-floor-name-form small { display:block; margin-top:7px; }
+.wm-floor-name-form input:focus-visible { outline:2px solid #e8b363; outline-offset:2px; }
+
+/* Edit directly on the cream level nameplate. */
+.wm-level-details h3.wm-editable-level-title { position:relative; padding:0; }
+.wm-level-details .wm-recycler-controls .wm-editable-level-title > button,
+.wm-level-details .wm-recycler-controls .wm-editable-level-title > input {
+    display:block; width:100%; min-width:0; min-height:54px; margin:0;
+    padding:12px 18px; border:0; border-radius:0; box-shadow:none;
+    background:transparent; color:#2a2117; text-align:left;
+    font:bold 20px 'Arial Narrow',Arial,sans-serif; text-transform:none;
+}
+.wm-editable-level-title > button:disabled { opacity:1; cursor:default; }
+.wm-editable-level-title > button:not(:disabled) { cursor:text; }
+.wm-editable-level-title > input:focus { outline:2px solid #8c5929; outline-offset:-7px; }
+.wm-name-announcement { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }
+
+.wm-level-expansion { padding:14px; border:3px ridge #a37b47; border-radius:5px; background:linear-gradient(#3d2c19,#21180f); }
+.wm-level-expansion > strong { color:#f4ce8e; font:bold 18px Arial,sans-serif; }
+.wm-level-expansion p { color:#dfc7a0; font:13px/1.5 Arial,sans-serif; }
+.wm-level-expansion button { width:100%; padding:18px 14px; border:0; color:#ffe8bf; background:#8c451c url('/assets/ui/action-button.png') center / 100% 145% no-repeat; font:bold 14px Arial,sans-serif; cursor:pointer; }
+.wm-level-expansion button:disabled { opacity:.5; cursor:wait; }
+.wm-level-expansion small { display:block; margin-top:9px; color:#c5b092; font:10px/1.5 Arial,sans-serif; }
