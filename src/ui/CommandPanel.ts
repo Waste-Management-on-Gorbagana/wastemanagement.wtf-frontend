@@ -248,6 +248,7 @@ export class CommandPanel {
         const installed = inspected && this.installedOnActiveFloor();
         const toolId = sovereign ? "sovereign" : "trash-recycler";
         const toolName = sovereign ? "Sovereign" : "Trash Recycler";
+        const toolArt = sovereign ? "/assets/backgrounds/wm-level-1-sovereign.png" : "/assets/gameplay/trash-recycler.png";
         const empty = inspected && state.established && floor.level >= 0 && !installed;
         const available = this.canAssignTool();
         this.element.querySelector<HTMLElement>(".wm-recycling-meter")!.hidden = !installed || sovereign;
@@ -259,11 +260,17 @@ export class CommandPanel {
         option.disabled = !available;
         option.setAttribute("aria-pressed", String(available && this.selectedTool === toolId));
         option.querySelector("strong")!.textContent = toolName;
-        option.querySelector<HTMLImageElement>("img")!.src = `/assets/gameplay/${toolId}.png`;
-        option.querySelector("small")!.textContent = sovereign ? "Single-sided token liquidity" : "Reclaim rent from unused accounts";
+        const optionArt = option.querySelector<HTMLImageElement>("img")!;
+        optionArt.src = toolArt;
+        optionArt.alt = `${toolName} machine`;
+        option.querySelector("small")!.textContent = sovereign ? "Private single-sided token liquidity" : "Reclaim rent from unused accounts";
         const card = this.element.querySelector<HTMLElement>(".wm-installed-tool")!;
         const art = card.querySelector<HTMLImageElement>("img")!;
-        art.src = `/assets/gameplay/${toolId}.png`; art.alt = `${toolName} machine`;
+        art.src = toolArt; art.alt = `${toolName} machine`;
+        for (const image of [optionArt, art]) {
+            image.style.objectFit = sovereign ? "cover" : "contain";
+            image.style.objectPosition = sovereign ? "72% center" : "center";
+        }
         card.querySelector("strong")!.textContent = toolName;
         card.querySelector("span")!.textContent = `Installed in level ${sovereign ? 1 : 0}`;
         const assign = this.element.querySelector<HTMLButtonElement>("[data-assign-tool]")!;
