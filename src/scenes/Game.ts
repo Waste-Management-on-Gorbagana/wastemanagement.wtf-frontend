@@ -90,6 +90,15 @@ export default class Game extends Phaser.Scene {
             filter: "blur(8px) brightness(0.6)", zIndex: "0"
         });
         host.prepend(backdrop);
+        const deliveryBacking = document.createElement("div");
+        deliveryBacking.setAttribute("aria-hidden", "true");
+        Object.assign(deliveryBacking.style, {
+            position:"absolute", inset:"0", pointerEvents:"none", zIndex:"0", display:"none",
+            background:"repeating-linear-gradient(0deg,transparent 0 3px,#d2b17a09 3px 4px), repeating-linear-gradient(117deg,transparent 0 9px,#bd86521a 9px 10px,transparent 10px 19px), linear-gradient(110deg,#4d4433,#1e352c 24%,#30463a 55%,#21372e 82%,#54432e)"
+        });
+        backdrop.after(deliveryBacking);
+        const deliveryFrame = { amount: 0 };
+        let framingMode: "delivery" | "processing" = "delivery";
         const canvas = this.game.canvas;
         const originalClip = canvas.style.clipPath;
         const originalPosition = canvas.style.position;
@@ -119,17 +128,54 @@ export default class Game extends Phaser.Scene {
             camera.setViewport(viewX, viewY, viewWidth, viewHeight);
             // Hide the renderer's empty margins, revealing the decorative underlay.
             canvas.style.clipPath = `inset(${viewY / this.scale.height * 100}% ${(this.scale.width - viewX - viewWidth) / this.scale.width * 100}% ${(this.scale.height - viewY - viewHeight) / this.scale.height * 100}% ${viewX / this.scale.width * 100}%)`;
-            const zoom = base * zoomFactor;
+            const amount = stacked ? deliveryFrame.amount : 0;
+            deliveryBacking.style.display = amount > 0 ? "block" : "none";
+            const contain = framingMode === "processing"
+                ? Math.min(viewWidth / (worldWidth * .43), viewHeight / (worldHeight * .69))
+                : Math.min(viewWidth / worldWidth, viewHeight / worldHeight);
+            const zoom = Phaser.Math.Linear(base * zoomFactor, contain, amount);
             camera.setZoom(zoom);
             const halfW = viewWidth / (2 * zoom), halfH = viewHeight / (2 * zoom);
             const x = halfW >= worldWidth / 2 ? worldWidth / 2 : Phaser.Math.Clamp(centreX, halfW, worldWidth - halfW);
             const y = halfH >= worldHeight / 2 ? worldHeight / 2 : Phaser.Math.Clamp(centreY, halfH, worldHeight - halfH);
-            camera.centerOn(x, y);
+            const targetHalfW = viewWidth / (2 * contain), targetHalfH = viewHeight / (2 * contain);
+            const targetX = framingMode === "processing" ? worldWidth * .215 : worldWidth / 2;
+            const targetY = framingMode === "processing" ? worldHeight * .575 : worldHeight / 2;
+            const safeX = targetHalfW >= worldWidth / 2 ? worldWidth / 2 : Phaser.Math.Clamp(targetX, targetHalfW, worldWidth - targetHalfW);
+            const safeY = targetHalfH >= worldHeight / 2 ? worldHeight / 2 : Phaser.Math.Clamp(targetY, targetHalfH, worldHeight - targetHalfH);
+            const actualX = Phaser.Math.Linear(x, safeX, amount);
+            const actualY = Phaser.Math.Linear(y, safeY, amount);
+            camera.centerOn(actualX, actualY);
+            if (amount > 0) {
+                // Project the actual world edges; expose metal wherever the shot
+                // is smaller than the viewing area, including during the tween.
+                const left = Math.max(viewX, viewX + viewWidth / 2 - actualX * zoom);
+                const top = Math.max(viewY, viewY + viewHeight / 2 - actualY * zoom);
+                const right = Math.min(viewX + viewWidth, viewX + viewWidth / 2 + (worldWidth - actualX) * zoom);
+                const bottom = Math.min(viewY + viewHeight, viewY + viewHeight / 2 + (worldHeight - actualY) * zoom);
+                canvas.style.clipPath = `inset(${top / this.scale.height * 100}% ${(this.scale.width - right) / this.scale.width * 100}% ${(this.scale.height - bottom) / this.scale.height * 100}% ${left / this.scale.width * 100}%)`;
+            }
             panel.setCameraZoom(zoomFactor);
         };
         let savedToolView: { zoom: number; x: number; y: number } | undefined;
         let focusTween: Phaser.Tweens.Tween | undefined;
+        const frameDelivery = (amount: number, mode: "delivery" | "processing" = framingMode): Promise<void> => {
+            framingMode = mode;
+            focusTween?.stop();
+            if (getComputedStyle(host).getPropertyValue("--wm-stacked-layout").trim() !== "1") {
+                deliveryFrame.amount = amount; applyCamera(); return Promise.resolve();
+            }
+            return new Promise(resolve => {
+                this.tweens.add({ targets: deliveryFrame, amount,
+                    duration: matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 400,
+                    ease:'Sine.easeInOut', onUpdate:applyCamera,
+                    onComplete:() => { applyCamera(); resolve(); }, onStop:() => resolve()
+                });
+            });
+        };
         const changeView = (action: string) => {
+            // Keep the complete delivery shot visible even if a tab or wheel is used.
+            if (deliveryFrame.amount > 0) return;
             if (action.startsWith("focus-") || action === "restore-tool") {
                 focusTween?.stop();
                 if (action.startsWith("focus-") && !savedToolView) savedToolView = { zoom: zoomFactor, x: centreX, y: centreY };
@@ -260,9 +306,16 @@ export default class Game extends Phaser.Scene {
             const batch = (newItems.length || identity !== "SESSION-PREVIEW" ? newItems : eligible).slice(0, 10);
             if (!batch.length || !identity) { deliveryBusy = false; deliveryMessage = "No recoverable trash available."; updateRecycler(); return; }
             deliveryMessage = "Trash delivery arriving…";
+            updateRecycler();
+            await frameDelivery(1, "delivery");
+            if (disposed) return;
             const playing = media.play(`delivery-${phase}.mp4`, true);
             updateRecycler();
             const success = await playing;
+            if (disposed) return;
+            // Return to the collection view only after the complete clip has ended.
+            zoomFactor = 1; centreX = worldWidth * .44; centreY = worldHeight / 2;
+            await frameDelivery(0);
             if (disposed) return;
             deliveryBusy = false;
             if (success && recoveryProvider()?.walletId() === identity && progress.built) {
@@ -292,10 +345,15 @@ export default class Game extends Phaser.Scene {
             } finally { recoveryBusy = false; if (!disposed) updateRecycler(); }
         }, async () => {
             if (disposed || !progress.built || selectedLevel !== 0) return false;
+            await frameDelivery(1, "processing");
+            if (disposed) return false;
             const playing = media.play(`processing-${phase}.mp4`, true);
             updateRecycler();
             const played = await playing;
             if (!disposed) {
+                zoomFactor = 1; centreX = worldWidth * .44; centreY = worldHeight / 2;
+                await frameDelivery(0);
+                if (disposed) return played;
                 if (!played) deliveryMessage = "Recovery completed, but the animation could not play.";
                 updateRecycler();
             }
@@ -376,6 +434,34 @@ export default class Game extends Phaser.Scene {
             if (!pointer.isDown && dy !== 0) changeView(dy > 0 ? "out" : "in");
         };
         this.input.on("wheel", wheel);
+        let pan: { id:number; x:number; y:number } | undefined;
+        const canPan = () => !disposed && !setup && !media.busy && !installationBusy && !deliveryBusy &&
+            !recoveryBusy && !recycler?.isProcessing && deliveryFrame.amount === 0 &&
+            getComputedStyle(host).getPropertyValue("--wm-stacked-layout").trim() === "1";
+        const panStart = (pointer: Phaser.Input.Pointer, objects: Phaser.GameObjects.GameObject[]) => {
+            // Interactive trash keeps Phaser's normal drag/drop gesture.
+            if (pan || !canPan() || objects.length || !pointer.isDown) { pan = undefined; return; }
+            focusTween?.stop();
+            centreX = camera.scrollX + camera.width / 2;
+            centreY = camera.scrollY + camera.height / 2;
+            pan = { id:pointer.id, x:pointer.x, y:pointer.y };
+        };
+        const panMove = (pointer: Phaser.Input.Pointer) => {
+            if (!pan || pan.id !== pointer.id) return;
+            if (!canPan() || !pointer.isDown) { pan = undefined; return; }
+            const halfW = camera.width / (2 * camera.zoom), halfH = camera.height / (2 * camera.zoom);
+            const x = centreX - (pointer.x - pan.x) / camera.zoom;
+            const y = centreY - (pointer.y - pan.y) / camera.zoom;
+            centreX = halfW >= worldWidth / 2 ? worldWidth / 2 : Phaser.Math.Clamp(x, halfW, worldWidth - halfW);
+            centreY = halfH >= worldHeight / 2 ? worldHeight / 2 : Phaser.Math.Clamp(y, halfH, worldHeight - halfH);
+            pan.x = pointer.x; pan.y = pointer.y; applyCamera();
+        };
+        const panEnd = () => { pan = undefined; };
+        this.input.on("pointerdown", panStart);
+        this.input.on("pointermove", panMove);
+        this.input.on("pointerup", panEnd);
+        this.input.on("pointerupoutside", panEnd);
+        this.input.on("gameout", panEnd);
 
         // Editor-generated objects stay in editorCreate; runtime layout stays here.
         this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
@@ -383,10 +469,15 @@ export default class Game extends Phaser.Scene {
             clearInterval(clockTimer); clearInterval(recoveryTimer);
             window.removeEventListener("wm:recovery-changed", recoveryChanged);
             this.input.off("wheel", wheel);
+            this.input.off("pointerdown", panStart);
+            this.input.off("pointermove", panMove);
+            this.input.off("pointerup", panEnd);
+            this.input.off("pointerupoutside", panEnd);
+            this.input.off("gameout", panEnd);
             observer.disconnect();
             document.removeEventListener("fullscreenchange", scheduleFit);
             window.removeEventListener("resize", scheduleFit);
-            backdrop.remove();
+            backdrop.remove(); deliveryBacking.remove();
             canvas.style.clipPath = originalClip;
             canvas.style.position = originalPosition;
             canvas.style.zIndex = originalZ;
