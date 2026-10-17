@@ -31,21 +31,32 @@ export class Level0Media {
                 if (!this.finish) return;
                 this.finish = undefined;
                 clearTimeout(this.timer);
+                video.video?.removeEventListener("timeupdate", watchdog);
                 video.removeAllListeners(); video.stop(); video.destroy();
                 this.video = undefined;
                 resolve(success);
             };
             const fit = () => video.setDisplaySize(LEVEL0.width, LEVEL0.height);
-            video.on("textureready", () => { fit(); video.setVisible(true); });
-            video.on("play", fit);
+            // Phaser emits textureready before it sets the video's frame size.
+            // Wait for created/play so display sizing uses the actual dimensions.
+            const show = () => { fit(); video.setVisible(true); };
+            video.on("created", show);
+            video.on("play", show);
             video.once("complete", () => this.finish?.(true));
             video.once("error", () => this.finish?.(false));
             video.once("unsupported", () => this.finish?.(false));
             // Mobile browsers may block audio if loading outlasts a user gesture.
             video.once("locked", () => { video.setMute(true); video.play(false); });
-            this.timer = setTimeout(() => this.finish?.(false), 45000);
+            // Allow slow mobile connections to load; reset the watchdog while
+            // frames advance so a longer healthy clip is never cut off.
+            const watchdog = () => {
+                clearTimeout(this.timer);
+                this.timer = setTimeout(() => this.finish?.(false), 90000);
+            };
+            watchdog();
             try {
                 video.loadURL(LEVEL0.assetRoot + file, !sound);
+                video.video?.addEventListener("timeupdate", watchdog);
                 video.setMute(!sound).setVolume(.55).play(false);
             } catch { this.finish?.(false); }
         });

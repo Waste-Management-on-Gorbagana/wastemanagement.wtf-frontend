@@ -127,7 +127,28 @@ export default class Game extends Phaser.Scene {
             camera.centerOn(x, y);
             panel.setCameraZoom(zoomFactor);
         };
+        let savedToolView: { zoom: number; x: number; y: number } | undefined;
+        let focusTween: Phaser.Tweens.Tween | undefined;
         const changeView = (action: string) => {
+            if (action.startsWith("focus-") || action === "restore-tool") {
+                focusTween?.stop();
+                if (action.startsWith("focus-") && !savedToolView) savedToolView = { zoom: zoomFactor, x: centreX, y: centreY };
+                const target = action === "restore-tool" ? savedToolView : action === "focus-sovereign"
+                    ? { zoom: 1.25, x: worldWidth * .68, y: worldHeight * .60 }
+                    : { zoom: 1.15, x: worldWidth * .30, y: worldHeight * .65 };
+                if (action === "restore-tool") savedToolView = undefined;
+                if (!target) return;
+                const start = { zoom: zoomFactor, x: centreX, y: centreY };
+                focusTween = this.tweens.add({ targets: start, ...target,
+                    duration: matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 400,
+                    ease: 'Sine.easeInOut', onUpdate: () => {
+                        zoomFactor = start.zoom; centreX = start.x; centreY = start.y; applyCamera();
+                    }
+                });
+                return;
+            }
+            focusTween?.stop();
+            if (action === "delivery-view") { zoomFactor = 1; centreX = worldWidth * .44; centreY = worldHeight / 2; }
             if (action === "all") { zoomFactor = 1; centreX = worldWidth / 2; centreY = worldHeight / 2; }
             if (action === "recycler") { zoomFactor = 1.3; centreX = worldWidth * .40; centreY = worldHeight * .70; }
             if (action === "in") zoomFactor = Math.min(3, zoomFactor + .2);
@@ -167,7 +188,7 @@ export default class Game extends Phaser.Scene {
             installationBusy = true;
             deliveryMessage = "Gorweld is installing the Trash Recycler…";
             // Do not assign yet: retain the plain dumpster beneath the video.
-            const playing = media.play(`install-${phase}.mp4`, true);
+            const playing = media.play(`install-${phase}-v2.mp4`, true);
             updateRecycler();
             const completed = await playing;
             if (disposed) return;
@@ -181,6 +202,7 @@ export default class Game extends Phaser.Scene {
         };
         const panel = new CommandPanel(business, floor => {
             if (recycler?.isProcessing || media.busy || installationBusy || deliveryBusy || recoveryBusy) return;
+            focusTween?.stop(); savedToolView = undefined;
             selectedLevel = floor.level === 1 ? 1 : 0;
             zoomFactor = 1; centreX = worldWidth / 2; centreY = worldHeight / 2;
             updateRecycler(); applyCamera();

@@ -2,6 +2,7 @@ import "./command-panel.css";
 import { CorporateTreasury, TreasurySnapshot } from "./CorporateTreasury";
 import { BusinessPreview } from "../business/BusinessPreview";
 import "./retro-neon.css";
+import { MobileCommandPanel } from "./MobileCommandPanel";
 
 
 /** One DOM host shared by the welcome scene and game scene. */
@@ -44,6 +45,7 @@ export interface TowerFloor {
 }
 
 export class CommandPanel {
+    private mobile?: MobileCommandPanel;
     private onTrashDelivery: () => void = () => {};
     setTrashDelivery(visible: boolean, busy: boolean, action: () => void, message = ""): void {
         this.onTrashDelivery = action;
@@ -52,6 +54,7 @@ export class CommandPanel {
         button.disabled = busy;
         button.textContent = "Trash Delivery";
         this.element.querySelector<HTMLElement>("[data-delivery-status]")!.textContent = message;
+        this.syncMobile();
     }
     private readonly shell = ensureGameShell();
     private readonly element = document.createElement("aside");
@@ -137,6 +140,22 @@ export class CommandPanel {
         this.shell.append(this.element);
         this.treasury = new CorporateTreasury(() => this.closeTreasury());
         this.element.append(this.treasury.element);
+        this.mobile = new MobileCommandPanel((action, id) => {
+            const click = (selector: string) => this.element.querySelector<HTMLButtonElement>(selector)?.click();
+            if (action === "focus") this.onView(this.floorToolId() === "sovereign" ? "focus-sovereign" : "focus-recycler");
+            if (action === "restore") this.onView("restore-tool");
+            if (action === "treasury") click("[data-open-treasury]");
+            if (action === "close-treasury") { delete this.element.dataset.corporateOpen; this.treasury.element.hidden = true; }
+            if (action === "delivery") { this.onView("delivery-view"); click("[data-trash-delivery]"); }
+            if (action === "unassign") click("[data-unassign-tool]");
+            if (action === "assign") { click("[data-select-tool]"); click("[data-assign-tool]"); }
+            if (action === "unlock") click("[data-stake-next-level]");
+            if (action === "floor" && !this.toolProcessing) {
+                const floor = this.floors.find(f => f.id === id);
+                if (floor) { this.selectedTool = null; this.setActiveFloor(floor.id); this.onFloorSelect(floor); }
+            }
+        });
+        this.element.append(this.mobile.element);
         if (business) this.setBusiness(business);
         this.element.addEventListener("click", event => {
             const button = (event.target as HTMLElement).closest<HTMLButtonElement>("button");
@@ -300,6 +319,25 @@ export class CommandPanel {
             : installed ? (state.recycled >= state.target ? (this.expansionUnlocked ? "Level 1 unlocked." : "Recycling target reached · Stake to unlock Level 1.") : "Trash Recycler installed · Drag trash into level 0 to recycle.")
             : available ? (sovereign ? "Choose Sovereign, then assign it to this level." : "Choose a tool to install in this level. Any recycling progress is kept when a tool is unassigned.")
             : "No unassigned tools available for this level yet.";
+        this.syncMobile();
+    }
+
+    private syncMobile(): void {
+        if (!this.mobile) return;
+        const text = (selector: string) => this.element.querySelector(selector)?.textContent ?? "";
+        const delivery = this.element.querySelector<HTMLButtonElement>("[data-trash-delivery]");
+        const sovereign = this.floorToolId() === "sovereign";
+        this.mobile.update({
+            name: text(".wm-business-name"), logo: this.element.querySelector<HTMLImageElement>(".wm-business-logo")?.getAttribute("src") || "",
+            floors: this.floors.filter(f=>f.level>=0).map(f=>({id:f.id,label:`${f.level} · ${this.floorNames[f.id] || (f.level===0 ? "Dumpster" : f.name)}`})),
+            activeFloor:this.activeFloor || "", tool:sovereign ? "Sovereign" : "Trash Recycler",
+            art:sovereign ? "/assets/backgrounds/wm-level-1-sovereign.png" : "/assets/gameplay/trash-recycler.png",
+            installed:this.installedOnActiveFloor(), busy:this.toolProcessing, canAssign:this.canAssignTool(),
+            unlock:this.recyclerState.established && this.expansionEligible && !this.expansionUnlocked,
+            unlockHelp:text("[data-unlock-help]"), deliveryVisible:!!delivery && !delivery.hidden,
+            deliveryBusy:!!delivery?.disabled, deliveryMessage:text("[data-delivery-status]"), status:text("[data-recycler-status]"),
+            netValue:text("[data-net-value]"),rank:text("[data-rank]")
+        });
     }
 
     private finishFloorName(save: boolean): void {
@@ -345,12 +383,14 @@ export class CommandPanel {
         if (business.logoDataUrl) logo.src = business.logoDataUrl;
         else logo.removeAttribute("src");
         this.element.querySelector<HTMLElement>(".wm-logo-placeholder")!.hidden = !!business.logoDataUrl;
+        this.syncMobile();
     }
 
     /** Legacy overview remains compatible; wallet balances are never treasury balances. */
     setOverview(data: PanelOverview): void {
         const rank = data.rank;
         this.element.querySelector("[data-rank]")!.textContent = rank !== null && Number.isInteger(rank) && rank > 0 ? `#${rank.toLocaleString("en-US")}` : "—";
+        this.syncMobile();
     }
 
     private renderBalances(): void {
@@ -365,6 +405,7 @@ export class CommandPanel {
         this.element.querySelector("[data-stake-mode]")!.textContent = preview ? "SIMULATED STAKE" : "";
         this.element.querySelector("[data-treasury-gor]")!.textContent = format(snapshot?.assets.find(a => a.id === "GOR")?.corporateBalance, "GOR");
         this.element.querySelector("[data-net-value]")!.textContent = format(snapshot?.netValueGOR, "GOR");
+        this.syncMobile();
     }
 
     private renderExpansion(): void {
@@ -441,6 +482,7 @@ export class CommandPanel {
     }
 
     private closeTreasury(): void {
+        if (this.mobile?.active) this.mobile.home();
         delete this.element.dataset.corporateOpen;
         this.treasury.element.hidden = true;
         const button = this.element.querySelector<HTMLButtonElement>("[data-open-treasury]")!;
@@ -449,6 +491,7 @@ export class CommandPanel {
     }
 
     destroy(): void {
+        this.mobile?.destroy();
         this.treasury.destroy();
         this.abort.abort();
         this.element.remove();
