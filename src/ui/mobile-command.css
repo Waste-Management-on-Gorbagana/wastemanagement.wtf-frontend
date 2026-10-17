@@ -1,82 +1,100 @@
-/* Mobile console: new presentation, existing gameplay actions. */
+/* Dedicated mobile console. Nine-slice rims keep corners round at every size. */
 .wm-mobile { display:none; }
 @media (max-width:900px), (pointer:coarse) and (max-width:1100px) {
  .wm-shell.wm-in-game > .wm-command { overflow:hidden; touch-action:auto; }
  .wm-command.wm-command > .wm-console-body { display:none !important; }
  .wm-command.wm-command { --mm-cream:#f3e0b7; --mm-ink:#201d13; --mm-cyan:#32e4ed; --mm-brass:#b78243; }
- .wm-mobile { position:absolute; inset:0; display:grid; grid-template-rows:minmax(0,1fr) 56px; gap:5px; padding:12px 14px 10px; color:var(--mm-cream); background:#07140f; isolation:isolate; }
- .wm-mobile:before { content:''; position:absolute; inset:0; pointer-events:none; z-index:-1; background:url('/assets/ui/wm-mobile/console-atlas.png') 97.4% 86.72% / 313.5% 391.875% no-repeat; }
- .mm-content { display:flex; flex-direction:column; min-height:0; gap:5px; }
- .mm-plate { position:relative; isolation:isolate; background:transparent; border:0; color:inherit; border-radius:7px; }
- .mm-plate:before { content:''; position:absolute; inset:0; z-index:-1; pointer-events:none; background-image:url('/assets/ui/wm-mobile/console-atlas.png'); background-size:313.5% 511.84%; background-repeat:no-repeat; background-position:2.1% 10.9%; }
- .wm-mobile button { min-width:0; min-height:44px; padding:7px 12px; font:bold 14px/1.15 'Arial Narrow',Arial,sans-serif; }
+ .wm-mobile { position:absolute; inset:0; display:grid; grid-template-rows:minmax(0,1fr) 58px; gap:7px; padding:19px 18px 18px; color:var(--mm-cream); background:transparent; isolation:isolate; }
+ .wm-mobile:before { content:''; position:absolute; inset:0; pointer-events:none; z-index:-1; border:22px solid transparent; border-image:url('/assets/ui/wm-mobile/mobile-shell.png') 140 fill / 22px / 0 stretch; }
+ .mm-content { display:flex; flex-direction:column; min-height:0; gap:7px; }
+ .mm-plate { position:relative; isolation:isolate; background:transparent; border:0; color:inherit; border-radius:5px; }
+ .mm-plate:before { content:''; position:absolute; inset:0; z-index:-1; pointer-events:none; border:10px solid transparent; border-image:url('/assets/ui/wm-mobile/mobile-plate.png') 170 fill / 12px / 0 stretch; }
+ .wm-mobile button { min-width:0; min-height:44px; padding:10px 15px; font:bold 14px/1.15 'Arial Narrow',Arial,sans-serif; }
  .wm-mobile button:focus-visible, .wm-mobile select:focus-visible { outline:2px solid var(--mm-cyan); outline-offset:-3px; }
- .wm-mobile button:disabled { color:#a7a599; cursor:not-allowed; }
+ .wm-mobile button:disabled { color:#aaa99d; cursor:not-allowed; }
  .wm-mobile button:disabled:before { filter:saturate(.25) brightness(.65); }
  .wm-mobile button:not(:disabled):active { filter:brightness(1.2); }
- .mm-identity { display:flex; align-items:center; gap:10px; flex:1 1 48px; min-height:42px; max-height:66px; padding:6px 12px; color:var(--mm-ink); }
- .mm-identity:before { background-position:2.1% 46.58%; }
- .mm-identity > img:not(.mm-brand), .mm-symbol { width:32px; height:32px; object-fit:contain; background:#e4d1ab; border:2px ridge var(--mm-brass); flex-shrink:0; }
+ .mm-identity { display:flex; align-items:center; gap:10px; flex:1 1 50px; min-height:46px; max-height:64px; padding:8px 16px; color:var(--mm-ink); }
+ .mm-identity:before { border-image:url('/assets/ui/wm-retro-neon/player-nameplate.png') 36 fill / 13px / 0 stretch; }
+ .mm-identity > img:not(.mm-brand), .mm-symbol { width:30px; height:30px; object-fit:contain; background:#e4d1ab; border:1px solid var(--mm-brass); flex-shrink:0; }
  .mm-identity strong { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font:bold 21px Impact,'Arial Narrow',sans-serif; }
- .mm-identity .mm-brand { width:76px; height:30px; object-fit:contain; margin-left:auto; }
- .mm-floor-row { display:grid; grid-template-columns:minmax(0,1fr) 110px 36px; gap:4px; flex:0 0 44px; }
+ .mm-identity .mm-brand { width:68px; height:28px; object-fit:contain; margin-left:auto; }
+ .mm-floor-row { display:grid; grid-template-columns:minmax(0,1fr) 106px 36px; gap:5px; flex:0 0 44px; }
  .mm-floor { display:flex; align-items:center; min-width:0; }
- .mm-floor select { appearance:auto; width:100%; min-width:0; height:44px; border:0; background:transparent; color:var(--mm-cream); padding:6px 10px; font:bold 13px Arial,sans-serif; }
+ .mm-floor select { appearance:auto; width:100%; min-width:0; height:44px; border:0; background:transparent; color:var(--mm-cream); padding:8px 13px; font:bold 13px Arial,sans-serif; }
  .mm-floor option { background:#12221b; }
- .wm-mobile .mm-info { padding:4px; font:bold 18px Georgia,serif; }
- .mm-unlock:before, .mm-secondary:before { background-position:97.4% 46.58%; }
- .mm-tool { display:flex; align-items:center; gap:10px; flex:1.25 1 60px; max-height:90px; text-align:left; }
- .mm-tool:before { background-size:313.5% 391.875%; background-position:2.1% 86.72%; }
- .mm-tool img { width:45px; height:45px; object-fit:contain; }
+ .wm-mobile .mm-info { padding:8px; font:bold 17px Georgia,serif; }
+ .wm-mobile .mm-unlock { padding:8px 10px; font-size:12px; }
+ .mm-unlock:before, .mm-secondary:before { border-image:url('/assets/ui/wm-retro-neon/button-steel.png') 25 fill / 10px / 0 stretch; }
+ .mm-tool { display:flex; align-items:center; gap:9px; flex:1.2 1 62px; max-height:90px; text-align:left; }
+ .mm-tool img { width:40px; height:40px; object-fit:contain; flex-shrink:0; }
  .mm-tool span { flex:1; min-width:0; }
- .mm-tool strong { display:block; font-size:17px; }
+ .mm-tool strong { display:block; font-size:16px; }
  .mm-tool small { display:block; margin-top:4px; font-size:11px; color:#c8d0ab; }
- .mm-tool b { font-size:26px; }
- .mm-primary { flex:1 1 44px; max-height:58px; color:#20180e; }
- .mm-primary:before { background-position:50.35% 46.58%; }
+ .mm-tool b { font-size:23px; }
+ .mm-primary { flex:1 1 44px; max-height:56px; color:#21180e; }
+ .mm-primary:before { border-image:url('/assets/ui/wm-retro-neon/button-orange.png') 27 fill / 10px / 0 stretch; }
  .mm-primary small { display:block; font-size:10px; margin-top:2px; }
  .mm-secondary { flex:0 0 44px; }
- .mm-nav { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:4px; min-height:0; }
- .wm-mobile .mm-nav button { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; padding:5px; font-size:11px; }
- .mm-nav svg { width:22px; height:22px; fill:none; stroke:currentColor; stroke-width:2.3; stroke-linejoin:round; stroke-linecap:round; }
- .mm-nav-1:before { background-position:50.35% 10.9%; }
- .mm-nav-2:before { background-position:97.4% 10.9%; }
- .mm-nav [aria-current='page'] { color:#85f1f3; box-shadow:inset 0 0 0 1px #45cbd3; }
- .mm-title { display:flex; align-items:center; gap:7px; flex:0 0 44px; }
+ .mm-nav { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:5px; min-height:0; }
+ .wm-mobile .mm-nav button { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; padding:9px 7px; font-size:11px; }
+ .mm-nav svg { width:20px; height:20px; fill:none; stroke:currentColor; stroke-width:2.3; stroke-linejoin:round; stroke-linecap:round; }
+ .mm-nav button:after { content:''; position:absolute; left:3px; top:18px; bottom:18px; width:3px; border-radius:3px; background:var(--lamp,#ff9129); box-shadow:0 0 5px var(--lamp,#ff9129); pointer-events:none; }
+ .mm-nav-1 { --lamp:#37dbe8; } .mm-nav-2 { --lamp:#c95aff; }
+ .mm-nav [aria-current='page'] { color:#9cf3ee; }
+ .mm-nav [aria-current='page']:before { filter:brightness(1.35); }
+ .mm-title { display:flex; align-items:center; gap:9px; flex:0 0 44px; padding:0 2px; }
  .mm-title h2 { flex:1; font:bold 17px/1.1 'Arial Narrow',Arial,sans-serif; margin:0; }
- .wm-mobile .mm-back { padding:8px 10px; font-size:13px; }
+ .wm-mobile .mm-back { padding:9px 13px; font-size:13px; }
  .mm-status { font-size:10px; max-width:56px; color:#abe5b4; }
- .mm-description, .mm-details { padding:12px 14px; color:var(--mm-ink); min-height:0; overflow:auto; overscroll-behavior:contain; }
+ /* Scroll the content inside a stationary rim; never put text beneath artwork. */
+ .mm-description, .mm-details { padding:20px 22px; color:var(--mm-ink); min-height:0; overflow:hidden; display:flex; flex-direction:column; }
  .mm-description { flex:1 1 auto; }
- .mm-description:before, .mm-details:before { background-size:313.5% 391.875%; background-position:50.35% 86.72%; }
- .mm-description p, .mm-details p { font:13px/1.4 Arial,sans-serif; margin:0 0 5px; }
- .mm-description small { font:11px/1.35 Arial,sans-serif; }
+ .mm-description:before, .mm-details:before { background:#edd8b2; background-clip:padding-box; border:13px solid transparent; border-image:url('/assets/ui/wm-retro-neon/player-nameplate.png') 36 / 13px / 0 stretch; }
+ .mm-scroll { flex:1; min-height:0; overflow:auto; overscroll-behavior:contain; scrollbar-width:thin; }
+ .mm-description p, .mm-details p { font:13px/1.45 Arial,sans-serif; margin:0 0 7px; overflow-wrap:anywhere; }
+ .mm-description small { font:11px/1.4 Arial,sans-serif; overflow-wrap:anywhere; }
  .mm-details { flex:1; }
  .mm-details dl { margin:0 0 14px; }
- .mm-details dl div { padding:8px 0; border-bottom:1px solid #826a43; }
+ .mm-details dl div { padding:7px 0; border-bottom:1px solid #826a4366; }
  .mm-details dt { font-size:12px; }
- .mm-details dd { font:bold 19px monospace; margin:5px 0 0; overflow-wrap:anywhere; }
+ .mm-details dd { font:bold 19px monospace; margin:6px 0 0; overflow-wrap:anywhere; }
  .mm-sr { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); }
- /* Treasury uses its real controls inside the same fixed lower panel. */
- .wm-command.wm-command > .wm-corporate { position:absolute; inset:12px 14px 72px; z-index:3; left:14px; width:auto; min-height:0; height:auto; padding:10px; overflow:auto; overscroll-behavior:contain; background:#102019; border:2px ridge var(--mm-brass); border-radius:6px; }
+ .wm-command.wm-command > .wm-corporate { position:absolute; inset:19px 18px 83px; z-index:3; left:18px; width:auto; min-height:0; height:auto; padding:16px; overflow:auto; overscroll-behavior:contain; background:#102019; border:2px ridge var(--mm-brass); border-radius:6px; }
  .wm-command.wm-command > .wm-corporate h2 { font-size:20px; }
  .wm-command.wm-command > .wm-corporate button { min-height:44px; }
  .wm-command.wm-command[data-corporate-open='true'] .mm-content { visibility:hidden; }
 }
-/* Short landscape screens need a side console to keep touch targets usable. */
 @media (orientation:landscape) and (max-height:540px) and (max-width:900px), (orientation:landscape) and (max-height:540px) and (pointer:coarse) and (max-width:1100px) {
  .wm-shell.wm-in-game { grid-template-columns:minmax(0,1fr) minmax(330px,46%); grid-template-rows:minmax(0,1fr); }
  .wm-shell.wm-in-game > #game-container { grid-column:1; grid-row:1; }
  .wm-shell.wm-in-game > .wm-command { grid-column:2; grid-row:1; }
 }
-@media (max-height:660px) and (orientation:portrait) {
- .wm-mobile { padding:7px 10px; grid-template-rows:minmax(0,1fr) 46px; gap:3px; }
- .mm-content { gap:3px; }
- .mm-identity { flex-basis:42px; }
+@media (max-height:680px) and (orientation:portrait) {
+ .wm-mobile { padding:13px 13px 12px; grid-template-rows:minmax(0,1fr) 48px; gap:4px; }
+ .wm-mobile:before { border-image-width:16px; }
+ .mm-content { gap:4px; }
+ .mm-identity { flex-basis:44px; min-height:42px; padding:6px 14px; }
  .mm-identity .mm-brand { display:none; }
- .mm-tool { flex-basis:44px; }
- .mm-tool img { height:32px; width:32px; }
+ .mm-tool { flex-basis:52px; min-height:52px; }
+ .mm-tool img { height:30px; width:30px; }
  .mm-tool small { margin-top:1px; }
  .mm-nav svg { height:16px; width:16px; }
- .wm-command.wm-command > .wm-corporate { inset:7px 10px 56px; }
+ .wm-mobile .mm-nav button { padding:7px 5px; gap:1px; }
+ .mm-description, .mm-details { padding:16px 18px; }
+ .wm-command.wm-command > .wm-corporate { inset:13px 13px 64px; }
+}
+
+/* Continuous opaque metal underlay fills the exterior corner cutouts.
+   It sits behind the scene/frame, uses no extra height, and cannot block input. */
+@media (max-width:900px), (pointer:coarse) and (max-width:1100px) {
+ .wm-shell.wm-in-game,
+ .wm-shell.wm-in-game > .wm-command {
+  background-color:#263b32;
+  background-image:
+   repeating-linear-gradient(0deg,transparent 0 3px,#d2b17a09 3px 4px),
+   repeating-linear-gradient(117deg,transparent 0 9px,#bd86521a 9px 10px,transparent 10px 19px),
+   linear-gradient(110deg,#4d4433 0%,#1e352c 24%,#30463a 55%,#21372e 82%,#54432e 100%);
+  background-size:100% 100%;
+ }
 }

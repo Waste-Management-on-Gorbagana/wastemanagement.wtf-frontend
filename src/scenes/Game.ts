@@ -188,7 +188,7 @@ export default class Game extends Phaser.Scene {
             installationBusy = true;
             deliveryMessage = "Gorweld is installing the Trash Recycler…";
             // Do not assign yet: retain the plain dumpster beneath the video.
-            const playing = media.play(`install-${phase}-v2.mp4`, true);
+            const playing = media.play(`install-${phase}.mp4`, true);
             updateRecycler();
             const completed = await playing;
             if (disposed) return;

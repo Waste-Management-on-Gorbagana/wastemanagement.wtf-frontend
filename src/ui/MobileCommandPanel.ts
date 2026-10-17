@@ -71,14 +71,14 @@ export class MobileCommandPanel {
             <button class="mm-primary mm-plate" data-mm="claim" disabled title="Revenue claims are not connected yet">Claim Rewards <small>Not connected</small></button>`;
         } else if (this.page === 'tool') {
             content.innerHTML = `<header class="mm-title">${back}<h2 tabindex="-1">${escape(s.tool)}</h2><span class="mm-status">${s.busy?'Working…':s.installed?'Ready':'Unassigned'}</span></header>
-            <div class="mm-description mm-plate"><p>${s.tool==='Trash Recycler'?'Recycle eligible accounts and tokens to recover GOR. Drop delivered trash into the right-hand intake.':'Private single-sided token liquidity.'}</p><small role="status">${escape(s.deliveryMessage || s.status)}</small></div>
+            <div class="mm-description mm-plate"><div class="mm-scroll"><p>${s.tool==='Trash Recycler'?'Recycle eligible accounts and tokens to recover GOR. Drop delivered trash into the right-hand intake.':'Private single-sided token liquidity.'}</p><small role="status">${escape(s.deliveryMessage || s.status)}</small></div></div>
             ${s.deliveryVisible?`<button class="mm-primary mm-plate" data-mm="delivery" ${disabled(s.deliveryBusy || s.busy)}>Trash Delivery</button>`:''}
             <button class="mm-secondary mm-plate" data-mm="${s.installed?'unassign':'assign'}" ${disabled(s.busy || (!s.installed && !s.canAssign))}>${s.installed?'Unassign':'Assign'}</button>`;
         } else if (this.page === 'treasury') {
             content.innerHTML = '';
         } else {
             const titles = {leaderboard:'Leaderboard',marketplace:'Marketplace',requirements:'Unlock Floor'};
-            content.innerHTML = `<header class="mm-title">${back}<h2 tabindex="-1">${titles[this.page]}</h2></header><div class="mm-details mm-plate">${this.page==='leaderboard'?`<dl><div><dt>Corporation net value</dt><dd>${escape(s.netValue)}</dd></div><div><dt>Your rank</dt><dd>${escape(s.rank)}</dd></div></dl><p>Rankings will appear when the leaderboard service is connected.</p>`:this.page==='marketplace'?'<p>Business listings will appear when the marketplace is connected.</p>':`<p>${escape(s.unlockHelp)}</p><button class="mm-primary mm-plate" data-mm="unlock" ${disabled(!s.unlock||s.busy)}>Unlock Floor</button>`}</div>`;
+            content.innerHTML = `<header class="mm-title">${back}<h2 tabindex="-1">${titles[this.page]}</h2></header><div class="mm-details mm-plate"><div class="mm-scroll">${this.page==='leaderboard'?`<dl><div><dt>Corporation net value</dt><dd>${escape(s.netValue)}</dd></div><div><dt>Your rank</dt><dd>${escape(s.rank)}</dd></div></dl><p>Rankings will appear when the leaderboard service is connected.</p>`:this.page==='marketplace'?'<p>Business listings will appear when the marketplace is connected.</p>':`<p>${escape(s.unlockHelp)}</p><button class="mm-primary mm-plate" data-mm="unlock" ${disabled(!s.unlock||s.busy)}>Unlock Floor</button>`}</div></div>`;
         }
     }
     destroy(): void { this.abort.abort(); this.element.remove(); }
