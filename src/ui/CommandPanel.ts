@@ -44,6 +44,15 @@ export interface TowerFloor {
 }
 
 export class CommandPanel {
+    private onTrashDelivery: () => void = () => {};
+    setTrashDelivery(visible: boolean, busy: boolean, action: () => void, message = ""): void {
+        this.onTrashDelivery = action;
+        const button = this.element.querySelector<HTMLButtonElement>("[data-trash-delivery]")!;
+        button.hidden = !visible;
+        button.disabled = busy;
+        button.textContent = "Trash Delivery";
+        this.element.querySelector<HTMLElement>("[data-delivery-status]")!.textContent = message;
+    }
     private readonly shell = ensureGameShell();
     private readonly element = document.createElement("aside");
     private readonly abort = new AbortController();
@@ -102,8 +111,10 @@ export class CommandPanel {
                         </button>
                     </div>
                     <div class="wm-installed-tool" hidden><img src="/assets/gameplay/trash-recycler.png" alt="Trash Recycler machine" class="wm-recycler-art"><div><small>ASSIGNED TOOL</small><strong>Trash Recycler</strong><span>Installed in level 0</span></div></div>
-                    <button type="button" data-unassign-tool hidden>Unassign</button>
+                    <button type="button" data-trash-delivery hidden>Trash Delivery</button>
+                    <button type="button" data-unassign-tool hidden style="margin-top:12px">Unassign</button>
                     <button type="button" data-assign-tool disabled hidden>Assign</button>
+                    <small data-delivery-status role="status" aria-live="polite"></small>
                     <p data-recycler-status aria-live="polite">Establish your business to unlock the first level.</p>
                     <small>SESSION PREVIEW · No WM moves or rent is reclaimed.</small>
                 </div>
@@ -130,6 +141,7 @@ export class CommandPanel {
         this.element.addEventListener("click", event => {
             const button = (event.target as HTMLElement).closest<HTMLButtonElement>("button");
             if (!button || button.disabled) return;
+            if (button.hasAttribute("data-trash-delivery")) this.onTrashDelivery();
             if (button.hasAttribute("data-open-treasury")) {
                 this.element.dataset.corporateOpen = "true";
                 button.setAttribute("aria-expanded", "true");

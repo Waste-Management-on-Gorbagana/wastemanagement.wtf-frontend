@@ -9,6 +9,8 @@ import { CommandPanel, ensureGameShell } from "../ui/CommandPanel";
 import { BusinessSetup } from "../ui/BusinessSetup";
 import { RecyclerProgress } from "../gameplay/RecyclerPreview";
 import { RecyclerWorld } from "../gameplay/RecyclerWorld";
+import { LEVEL0, Level0Media, level0Key, utcPhase, TimeOfDay } from "../gameplay/Level0Media";
+import { recoveryProvider, validTrash, RecoverableTrash } from "../gameplay/RecoverySource";
 import { loadBusinessPreview } from "../business/BusinessPreview";
 /* END-USER-IMPORTS */
 
@@ -32,6 +34,10 @@ export default class Game extends Phaser.Scene {
 	/* START-USER-CODE */
 
     preload(): void {
+        for (const installed of [false, true]) for (const phase of ["day", "night"] as TimeOfDay[]) {
+            const key = level0Key(installed, phase);
+            if (!this.textures.exists(key)) this.load.image(key, LEVEL0.assetRoot + key + ".png");
+        }
         for (const key of ["wm-level-1-workshop", "wm-level-1-sovereign"]) {
             if (!this.textures.exists(key)) this.load.image(key, `assets/backgrounds/${key}.png`);
         }
@@ -54,7 +60,19 @@ export default class Game extends Phaser.Scene {
 
     create(): void {
         this.editorCreate();
-        const background = this.add.image(0, 0, "wm-starting-alley-branded", "__BASE");
+        const previewPhase = new URLSearchParams(location.search).get("wmTime");
+        const nowPhase = () => previewPhase === "day" || previewPhase === "night" ? previewPhase : utcPhase();
+        let phase: TimeOfDay = nowPhase();
+        const media = new Level0Media(this);
+        let disposed = false;
+        let deliveryBusy = false;
+        let recoveryBusy = false;
+        let refreshing = false;
+        let wallet: string | null = null;
+        let eligible: RecoverableTrash[] = [];
+        let deliveryMessage = "";
+        let request = new AbortController();
+        const background = this.add.image(0, 0, level0Key(false, phase), "__BASE");
         // Fixed world coordinates keep props anchored to the artwork during zoom/resize.
         const worldWidth = 1670, worldHeight = 942;
         background?.setOrigin(0).setPosition(0, 0).setDisplaySize(worldWidth, worldHeight);
@@ -124,14 +142,18 @@ export default class Game extends Phaser.Scene {
         let recycler: RecyclerWorld | undefined;
         let selectedLevel = 0;
         const updateRecycler = () => {
-            const backgroundKey = selectedLevel === 1 ? (progress.sovereignBuilt ? "wm-level-1-sovereign" : "wm-level-1-workshop") : progress.built ? "wm-alley-recycler-upgraded" : progress.established ? "wm-alley-recycler-installed" : "wm-starting-alley-branded";
-            backdrop.style.backgroundImage = `url("assets/backgrounds/${backgroundKey}.png")`;
+            const backgroundKey = selectedLevel === 1 ? (progress.sovereignBuilt ? "wm-level-1-sovereign" : "wm-level-1-workshop") : level0Key(progress.built, phase);
+            backdrop.style.backgroundImage = `url("${selectedLevel === 0 ? LEVEL0.assetRoot : "assets/backgrounds/"}${backgroundKey}.png")`;
             if (background && this.textures.exists(backgroundKey)) {
                 background.setTexture(backgroundKey, "__BASE").setDisplaySize(worldWidth, worldHeight);
             }
-            recycler?.setActive(selectedLevel === 0);
+            recycler?.setPaused(media.busy || deliveryBusy);
+            recycler?.setActive(selectedLevel === 0 && !deliveryBusy);
             panel.setSovereign(progress.sovereignBuilt);
-            panel.setToolProcessing(recycler?.isProcessing ?? false);
+            panel.setToolProcessing(!!recycler?.isProcessing || media.busy || deliveryBusy || recoveryBusy);
+            panel.setTrashDelivery(selectedLevel === 0 && progress.built,
+                media.busy || deliveryBusy || recoveryBusy || !!recycler?.isProcessing,
+                () => { void deliver(); }, deliveryMessage || (wallet === "SESSION-PREVIEW" ? "Test mode · No tokens move or rent is recovered." : ""));
             panel.setExpansion(progress.nextLevelEligible, progress.nextLevelUnlocked);
             panel.setRecycler(progress.established, progress.built, progress.recycled.size, progress.nextLevelAccountRequirement);
             const floors = [{ id: progress.established ? "slot-1" : "alley", name: progress.established ? "Level 0" : "The Alley", level: progress.established ? 0 : -1, x: worldWidth * .30, y: worldHeight * .72 }];
@@ -140,25 +162,117 @@ export default class Game extends Phaser.Scene {
             recycler?.refresh();
         };
         const panel = new CommandPanel(business, floor => {
-            if (recycler?.isProcessing) return;
+            if (recycler?.isProcessing || media.busy || deliveryBusy || recoveryBusy) return;
             selectedLevel = floor.level === 1 ? 1 : 0;
             zoomFactor = 1; centreX = worldWidth / 2; centreY = worldHeight / 2;
             updateRecycler(); applyCamera();
         }, toolId => {
-            if (recycler?.isProcessing) return;
+            if (recycler?.isProcessing || media.busy || deliveryBusy || recoveryBusy) return;
             const assigned = selectedLevel === 1 && toolId === "sovereign"
                 ? progress.assignSovereign()
                 : selectedLevel === 0 && toolId === "trash-recycler" && progress.assignTool(toolId);
             if (assigned) { updateRecycler(); applyCamera(); }
         }, changeView, () => {
-            if (recycler?.isProcessing) return;
+            if (recycler?.isProcessing || media.busy || deliveryBusy || recoveryBusy) return;
             const removed = selectedLevel === 1 ? progress.unassignSovereign() : progress.unassignTool();
             if (removed) updateRecycler();
         }, () => {
-            if (recycler?.isProcessing) return;
+            if (recycler?.isProcessing || media.busy || deliveryBusy || recoveryBusy) return;
             if (progress.simulateNextLevelStake()) updateRecycler();
         });
-        recycler = new RecyclerWorld(this, progress, updateRecycler);
+        const refreshRecovery = async (): Promise<void> => {
+            if (refreshing || disposed) return;
+            refreshing = true;
+            const provider = recoveryProvider();
+            const identity = provider?.walletId() ?? null;
+            if (wallet !== identity) {
+                request.abort(); request = new AbortController();
+                wallet = identity; eligible = []; recycler?.setItems([]); media.cancel();
+                deliveryMessage = "";
+            }
+            try {
+                const items = identity && provider ? await provider.list(request.signal) : [];
+                if (disposed || provider !== recoveryProvider() || identity !== provider?.walletId()) return;
+                eligible = validTrash(items);
+                if (!recycler?.isProcessing) {
+                    const delivered = recycler?.pendingIds ?? new Set<string>();
+                    recycler?.setItems(eligible.filter(x => delivered.has(x.id)));
+                }
+            } catch {
+                eligible = [];
+                if (!disposed) deliveryMessage = "Could not check recoverable assets. Try again shortly.";
+            } finally {
+                refreshing = false;
+                if (!disposed) updateRecycler();
+            }
+        };
+        const deliver = async (): Promise<void> => {
+            if (deliveryBusy || recoveryBusy || media.busy || recycler?.isProcessing || selectedLevel !== 0 || !progress.built) return;
+            deliveryBusy = true; deliveryMessage = "Checking delivery…"; updateRecycler();
+            await refreshRecovery();
+            if (disposed) return;
+            const identity = wallet;
+            const pending = recycler?.pendingIds ?? new Set<string>();
+            const newItems = eligible.filter(x => !pending.has(x.id));
+            const batch = (newItems.length || identity !== "SESSION-PREVIEW" ? newItems : eligible).slice(0, 10);
+            if (!batch.length || !identity) { deliveryBusy = false; deliveryMessage = "No recoverable trash available."; updateRecycler(); return; }
+            deliveryMessage = "Trash delivery arriving…";
+            const playing = media.play(`delivery-${phase}.mp4`, true);
+            updateRecycler();
+            const success = await playing;
+            if (disposed) return;
+            deliveryBusy = false;
+            if (success && recoveryProvider()?.walletId() === identity && progress.built) {
+                // Current full-frame clips have no alpha matte. Reveal after the clip;
+                // a future truck matte can reveal these same sprites during departure.
+                const delivered = new Set([...pending, ...batch.map(x => x.id)]);
+                recycler?.setItems(eligible.filter(x => delivered.has(x.id)));
+                deliveryMessage = "Drag the delivered trash into the right-hand intake.";
+            } else deliveryMessage = "Delivery could not finish. Press Trash Delivery to retry.";
+            updateRecycler();
+        };
+        recycler = new RecyclerWorld(this, progress, updateRecycler, async item => {
+            const provider = recoveryProvider(); const identity = provider?.walletId();
+            if (!provider || !identity || identity !== wallet) return false;
+            recoveryBusy = true; updateRecycler();
+            try {
+                const result = await provider.recover(item, request.signal);
+                if (disposed || provider !== recoveryProvider() || provider.walletId() !== identity || !result.confirmed) return false;
+                eligible = eligible.filter(x => x.id !== item.id);
+                // Existing progression is session-only; never treats this as staking.
+                progress.recycle(progress.recycled.size);
+                deliveryMessage = identity === "SESSION-PREVIEW" ? "Preview recycled. No assets moved." : "Recovery confirmed.";
+                return true;
+            } catch {
+                deliveryMessage = "Recovery cancelled or failed. The trash has been restored.";
+                return false;
+            } finally { recoveryBusy = false; if (!disposed) updateRecycler(); }
+        }, async () => {
+            if (disposed || !progress.built || selectedLevel !== 0) return false;
+            const playing = media.play(`processing-${phase}.mp4`, true);
+            updateRecycler();
+            const played = await playing;
+            if (!disposed) {
+                if (!played) deliveryMessage = "Recovery completed, but the animation could not play.";
+                updateRecycler();
+            }
+            return played;
+        });
+        void refreshRecovery();
+        const recoveryTimer = window.setInterval(() => { void refreshRecovery(); }, 30000);
+        const recoveryChanged = () => { void refreshRecovery(); };
+        window.addEventListener("wm:recovery-changed", recoveryChanged);
+        let lastTick = Date.now();
+        const clockTimer = window.setInterval(() => {
+            const target = nowPhase(); const elapsed = Date.now() - lastTick; lastTick = Date.now();
+            if (document.hidden || disposed || target === phase || media.busy || deliveryBusy || recycler?.isProcessing) return;
+            // On load / after a suspended tab use the correct still immediately.
+            if (selectedLevel !== 0 || elapsed > 60000) { phase = target; updateRecycler(); return; }
+            const file = `${progress.built ? "recycler" : "bare"}-${target === "night" ? "dusk" : "dawn"}.mp4`;
+            const playing = media.play(file);
+            updateRecycler();
+            void playing.then(() => { if (!disposed) { phase = nowPhase(); updateRecycler(); } });
+        }, 1000);
         recycler.setBrand(business?.logoDataUrl);
         updateRecycler();
         panel.setOverview({ priceUsd: null, change24hPercent: null, walletBalanceWM: null, walletConnected: false, rank: null });
@@ -222,6 +336,9 @@ export default class Game extends Phaser.Scene {
 
         // Editor-generated objects stay in editorCreate; runtime layout stays here.
         this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+            disposed = true; request.abort(); media.destroy();
+            clearInterval(clockTimer); clearInterval(recoveryTimer);
+            window.removeEventListener("wm:recovery-changed", recoveryChanged);
             this.input.off("wheel", wheel);
             observer.disconnect();
             document.removeEventListener("fullscreenchange", scheduleFit);

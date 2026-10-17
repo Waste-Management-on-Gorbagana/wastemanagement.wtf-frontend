@@ -152,3 +152,25 @@
     .wm-command.wm-command .wm-tool-option small,
     .wm-command.wm-command .wm-installed-tool span { font-size:12px; }
 }
+
+/* The source frame has an asymmetric transparent gutter on its left edge.
+   Offset the artwork and its contents together, only in the mobile panel. */
+@media (max-width:900px), (pointer:coarse) and (max-width:1100px) {
+    .wm-command.wm-command .wm-console-body,
+    .wm-command.wm-command .wm-corporate {
+        position:relative;
+        left:-3.25%;
+        width:100%;
+        box-sizing:border-box;
+    }
+}
+
+/* Level 0 collection action; remains inside the command panel on mobile. */
+.wm-command.wm-command [data-trash-delivery] {
+    width: 100%; min-height: 55px; margin-top: 10px; border: 0;
+    background: url('/assets/ui/wm-retro-neon/button-orange.png') center/100% 100% no-repeat;
+    color: #fff1d1; font: bold 20px 'Arial Narrow',Arial,sans-serif;
+}
+.wm-command.wm-command [data-trash-delivery]:disabled { opacity: .55; cursor: wait; }
+.wm-command [data-delivery-status] { display: block; padding-top: 8px; color: #ead9b5; }
+.wm-command [data-delivery-status]:empty { display: none; }
