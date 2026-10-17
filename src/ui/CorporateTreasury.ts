@@ -49,8 +49,8 @@ export class CorporateTreasury {
         this.element.hidden = true;
         this.element.setAttribute('aria-label', 'Corporate treasury');
         this.element.innerHTML = `
-            <button type="button" class="ct-back" data-ct-back>← Game</button>
-            <h2 tabindex="-1">Corporate Treasury</h2>
+            <header class="ct-heading"><button type="button" class="ct-back" data-ct-back>← Game</button>
+            <h2 tabindex="-1">Corporate Treasury</h2></header><div class="ct-scroll">
             <p class="ct-nft" data-ct-nft>Corporate NFT · Not connected</p>
             <div data-ct-treasury>
                 <div class="ct-balances" data-ct-balances></div>
@@ -70,7 +70,7 @@ export class CorporateTreasury {
                 <button type="submit" class="ct-primary ct-submit" disabled>Review deposit</button>
                 <div class="ct-confirm" data-ct-confirm hidden tabindex="-1"><h3>Deposit review</h3><p data-ct-summary></p><button type="button" class="ct-primary" disabled>Wallet approval unavailable</button><p>Deposits are not connected yet. No assets have moved.</p></div>
                 <p class="ct-connection">Master program not connected · Deposits unavailable</p>
-            </form>`;
+            </form></div>`;
         this.element.querySelector('[data-ct-back]')!.addEventListener('click', () => {
             if (this.page === 'deposit') this.show('treasury'); else this.onGame();
         }, { signal: this.abort.signal });

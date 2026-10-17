@@ -98,3 +98,55 @@
   background-size:100% 100%;
  }
 }
+
+/* Treasury shares the mobile shell, pinned heading and bottom navigation. */
+@media (max-width:900px), (pointer:coarse) and (max-width:1100px) {
+ .wm-command.wm-command[data-corporate-open='true'] > .wm-mobile { display:grid !important; }
+ .wm-command.wm-command > .wm-corporate { padding:0; border:0; background:transparent; overflow:hidden; gap:8px; box-shadow:none; }
+ .wm-command.wm-command .wm-corporate .ct-heading { display:flex; align-items:center; gap:9px; flex:0 0 44px; }
+ .wm-command.wm-command .wm-corporate h2 { flex:1; margin:0; padding:0; border:0; text-align:left; font:bold 17px/1.1 'Arial Narrow',Arial,sans-serif; text-transform:none; }
+ .wm-command.wm-command .wm-corporate .ct-scroll { display:block; flex:1; min-height:0; overflow:auto; overscroll-behavior:contain; scrollbar-width:thin; padding:0 2px 4px; }
+ .wm-command.wm-command .wm-corporate .ct-back,
+ .wm-command.wm-command .wm-corporate .ct-primary,
+ .wm-command.wm-command .wm-corporate .ct-secondary,
+ .wm-command.wm-command .wm-corporate .ct-amount button { position:relative; isolation:isolate; border:0; background:none; box-shadow:none; min-height:44px; min-width:0; padding:10px 14px; font:bold 13px/1.2 Arial,sans-serif; text-transform:none; text-shadow:none; }
+ .wm-command.wm-command .wm-corporate button:before { content:''; position:absolute; inset:0; z-index:-1; border:10px solid transparent; border-image:url('/assets/ui/wm-mobile/mobile-plate.png') 170 fill / 12px / 0 stretch; pointer-events:none; }
+ .wm-command.wm-command .wm-corporate .ct-primary:before { border-image-source:url('/assets/ui/wm-retro-neon/button-orange.png'); border-image-slice:27 fill; border-image-width:10px; }
+ .wm-command.wm-command .wm-corporate .ct-secondary:before { border-image-source:url('/assets/ui/wm-retro-neon/button-steel.png'); border-image-slice:25 fill; border-image-width:10px; }
+ .wm-command.wm-command .wm-corporate button:disabled { opacity:.65; }
+ .wm-command.wm-command .wm-corporate .ct-nft { margin:0 0 8px; text-align:left; font:11px/1.4 Arial,sans-serif; overflow-wrap:anywhere; }
+ .wm-command.wm-command .wm-corporate .ct-balances { gap:7px; }
+ .wm-command.wm-command .wm-corporate .ct-token,
+ .wm-command.wm-command .wm-corporate .ct-stake,
+ .wm-command.wm-command .wm-corporate .ct-review { position:relative; isolation:isolate; border:0; background:none; box-shadow:none; padding:14px 16px; border-radius:5px; }
+ .wm-command.wm-command .wm-corporate .ct-token:before,
+ .wm-command.wm-command .wm-corporate .ct-stake:before,
+ .wm-command.wm-command .wm-corporate .ct-review:before { content:''; position:absolute; inset:0; z-index:-1; border:10px solid transparent; border-image:url('/assets/ui/wm-mobile/mobile-plate.png') 170 fill / 12px / 0 stretch; pointer-events:none; }
+ .wm-command.wm-command .wm-corporate .ct-balances .ct-token { grid-template-columns:minmax(0,1fr); gap:5px; }
+ .wm-command.wm-command .wm-corporate .ct-balances .ct-token-icon { display:none; }
+ .wm-command.wm-command .wm-corporate .ct-balances .ct-token > span:not(.ct-token-icon) { font:bold 11px Arial,sans-serif; color:#c8d0ab; }
+ .wm-command.wm-command .wm-corporate .ct-balances strong { font:bold 18px/1.2 monospace; }
+ .wm-command.wm-command .wm-corporate .ct-stake { gap:8px; margin:7px 0; font:bold 12px Arial,sans-serif; flex-wrap:wrap; }
+ .wm-command.wm-command .wm-corporate .ct-stake strong { font:bold 15px/1.25 monospace; overflow-wrap:anywhere; }
+ .wm-command.wm-command .wm-corporate .ct-actions { gap:7px; margin-bottom:10px; }
+ .wm-command.wm-command .wm-corporate h3 { margin:14px 0 7px; font:bold 14px Arial,sans-serif; text-transform:none; }
+ .wm-command.wm-command .wm-corporate .ct-empty { margin:0 0 8px; padding:10px; font:12px Arial,sans-serif; border-color:#6e775b; background:#10251c; }
+ .wm-command.wm-command .wm-corporate .ct-note,
+ .wm-command.wm-command .wm-corporate .ct-connection { font:11px/1.4 Arial,sans-serif; }
+ .wm-command.wm-command .wm-corporate form { gap:7px; }
+ .wm-command.wm-command .wm-corporate .ct-transfer { margin:0 0 6px; font:bold 11px/1.3 Arial,sans-serif; }
+ .wm-command.wm-command .wm-corporate .ct-transfer span { padding:10px 5px; background:#10251c; }
+ .wm-command.wm-command .wm-corporate label { font:bold 12px Arial,sans-serif; }
+ .wm-command.wm-command .wm-corporate input,
+ .wm-command.wm-command .wm-corporate select { min-height:44px; font:16px Arial,sans-serif; background:#0b1a14; padding:9px 12px; }
+ .wm-command.wm-command .wm-corporate .ct-wallet { margin:0 0 4px; font-size:11px; }
+ .wm-command.wm-command .wm-corporate .ct-review > div { font:12px/1.5 Arial,sans-serif; }
+}
+@media (max-width:900px), (pointer:coarse) and (max-width:1100px) {
+ .mm-rename { margin:0 0 14px; }
+ .mm-rename label { display:block; font:bold 12px Arial,sans-serif; margin-bottom:6px; }
+ .mm-rename > div { display:flex; gap:6px; }
+ .mm-rename input { flex:1; min-width:0; width:100%; min-height:44px; border:1px solid #7b6847; border-radius:4px; padding:8px; background:#fff0d4; color:#201d13; font:16px Arial,sans-serif; }
+ .wm-mobile .mm-rename button { color:var(--mm-cream); flex-shrink:0; }
+ .mm-rename small { display:block; margin-top:6px; font:11px/1.4 Arial,sans-serif; }
+}

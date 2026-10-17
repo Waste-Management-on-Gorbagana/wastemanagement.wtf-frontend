@@ -1,7 +1,7 @@
 import './mobile-command.css';
 
 export interface MobilePanelState {
-    name: string; logo: string; floors: { id: string; label: string }[]; activeFloor: string;
+    name: string; logo: string; floorName: string; renameStatus: string; floors: { id: string; label: string }[]; activeFloor: string;
     tool: string; art: string; installed: boolean; busy: boolean; canAssign: boolean;
     unlock: boolean; unlockHelp: string; deliveryVisible: boolean; deliveryBusy: boolean;
     deliveryMessage: string; status: string; netValue: string; rank: string;
@@ -35,6 +35,15 @@ export class MobileCommandPanel {
                 this.action('floor', (e.target as HTMLSelectElement).value);
             }
         }, {signal:this.abort.signal});
+        this.element.addEventListener('submit', e => {
+            if (!(e.target as HTMLElement).matches('[data-mm-rename]')) return;
+            e.preventDefault();
+            const form = e.target as HTMLFormElement;
+            const input = form.querySelector<HTMLInputElement>('input')!;
+            if (this.state?.busy || !form.reportValidity()) return;
+            this.action('rename', input.value);
+        }, {signal:this.abort.signal});
+        for (const type of ['keydown', 'keyup']) this.element.addEventListener(type, e => e.stopPropagation(), {signal:this.abort.signal});
         this.media.addEventListener('change', () => { if (!this.media.matches) this.navigate('home'); }, {signal:this.abort.signal});
     }
     get active(): boolean { return this.media.matches; }
@@ -77,8 +86,8 @@ export class MobileCommandPanel {
         } else if (this.page === 'treasury') {
             content.innerHTML = '';
         } else {
-            const titles = {leaderboard:'Leaderboard',marketplace:'Marketplace',requirements:'Unlock Floor'};
-            content.innerHTML = `<header class="mm-title">${back}<h2 tabindex="-1">${titles[this.page]}</h2></header><div class="mm-details mm-plate"><div class="mm-scroll">${this.page==='leaderboard'?`<dl><div><dt>Corporation net value</dt><dd>${escape(s.netValue)}</dd></div><div><dt>Your rank</dt><dd>${escape(s.rank)}</dd></div></dl><p>Rankings will appear when the leaderboard service is connected.</p>`:this.page==='marketplace'?'<p>Business listings will appear when the marketplace is connected.</p>':`<p>${escape(s.unlockHelp)}</p><button class="mm-primary mm-plate" data-mm="unlock" ${disabled(!s.unlock||s.busy)}>Unlock Floor</button>`}</div></div>`;
+            const titles = {leaderboard:'Leaderboard',marketplace:'Marketplace',requirements:'Floor information'};
+            content.innerHTML = `<header class="mm-title">${back}<h2 tabindex="-1">${titles[this.page]}</h2></header><div class="mm-details mm-plate"><div class="mm-scroll">${this.page==='leaderboard'?`<dl><div><dt>Corporation net value</dt><dd>${escape(s.netValue)}</dd></div><div><dt>Your rank</dt><dd>${escape(s.rank)}</dd></div></dl><p>Rankings will appear when the leaderboard service is connected.</p>`:this.page==='marketplace'?'<p>Business listings will appear when the marketplace is connected.</p>':`<form class="mm-rename" data-mm-rename><label for="mm-floor-name">Floor name</label><div><input id="mm-floor-name" name="floorName" maxlength="32" required autocomplete="off" value="${escape(s.floorName)}" ${disabled(s.busy || !s.floors.length)}><button type="submit" class="mm-plate" ${disabled(s.busy || !s.floors.length)}>Save</button></div><small role="status">${escape(s.renameStatus)}</small></form><p>${escape(s.unlockHelp)}</p><button class="mm-primary mm-plate" data-mm="unlock" ${disabled(!s.unlock||s.busy)}>Unlock Floor</button>`}</div></div>`;
         }
     }
     destroy(): void { this.abort.abort(); this.element.remove(); }

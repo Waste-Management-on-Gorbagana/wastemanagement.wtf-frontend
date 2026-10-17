@@ -45,3 +45,6 @@
 .wm-corporate :focus-visible { outline:2px solid #f5c36e; outline-offset:3px; }
 @media(max-width:900px) { .wm-command .wm-rewards-row button { font-size:19px; } }
 
+
+/* Structural wrappers retain the desktop layout. */
+.wm-corporate .ct-heading, .wm-corporate .ct-scroll { display:contents; }

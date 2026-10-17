@@ -150,6 +150,14 @@ export class CommandPanel {
             if (action === "unassign") click("[data-unassign-tool]");
             if (action === "assign") { click("[data-select-tool]"); click("[data-assign-tool]"); }
             if (action === "unlock") click("[data-stake-next-level]");
+            if (action === "rename" && !this.toolProcessing && this.recyclerState.established && this.activeFloor) {
+                const floor = this.floors.find(f => f.id === this.activeFloor && f.level >= 0);
+                if (floor && id?.trim()) {
+                    this.editingFloorId = floor.id;
+                    this.element.querySelector<HTMLInputElement>("[data-level-name-edit]")!.value = id;
+                    this.finishFloorName(true);
+                }
+            }
             if (action === "floor" && !this.toolProcessing) {
                 const floor = this.floors.find(f => f.id === id);
                 if (floor) { this.selectedTool = null; this.setActiveFloor(floor.id); this.onFloorSelect(floor); }
@@ -330,6 +338,8 @@ export class CommandPanel {
         this.mobile.update({
             name: text(".wm-business-name"), logo: this.element.querySelector<HTMLImageElement>(".wm-business-logo")?.getAttribute("src") || "",
             floors: this.floors.filter(f=>f.level>=0).map(f=>({id:f.id,label:`${f.level} · ${this.floorNames[f.id] || (f.level===0 ? "Dumpster" : f.name)}`})),
+            floorName:this.floorNames[this.activeFloor || ""] || (this.activeFloor === "slot-1" ? "Dumpster" : this.floors.find(f => f.id === this.activeFloor)?.name || ""),
+            renameStatus:text("[data-floor-name-status]"),
             activeFloor:this.activeFloor || "", tool:sovereign ? "Sovereign" : "Trash Recycler",
             art:sovereign ? "/assets/backgrounds/wm-level-1-sovereign.png" : "/assets/gameplay/trash-recycler.png",
             installed:this.installedOnActiveFloor(), busy:this.toolProcessing, canAssign:this.canAssignTool(),
