@@ -66,6 +66,7 @@ export default class Game extends Phaser.Scene {
         const media = new Level0Media(this);
         let disposed = false;
         let deliveryBusy = false;
+        let installationBusy = false;
         let recoveryBusy = false;
         let refreshing = false;
         let wallet: string | null = null;
@@ -147,12 +148,12 @@ export default class Game extends Phaser.Scene {
             if (background && this.textures.exists(backgroundKey)) {
                 background.setTexture(backgroundKey, "__BASE").setDisplaySize(worldWidth, worldHeight);
             }
-            recycler?.setPaused(media.busy || deliveryBusy);
-            recycler?.setActive(selectedLevel === 0 && !deliveryBusy);
+            recycler?.setPaused(media.busy || installationBusy || deliveryBusy);
+            recycler?.setActive(selectedLevel === 0 && !installationBusy && !deliveryBusy);
             panel.setSovereign(progress.sovereignBuilt);
-            panel.setToolProcessing(!!recycler?.isProcessing || media.busy || deliveryBusy || recoveryBusy);
+            panel.setToolProcessing(!!recycler?.isProcessing || media.busy || installationBusy || deliveryBusy || recoveryBusy);
             panel.setTrashDelivery(selectedLevel === 0 && progress.built,
-                media.busy || deliveryBusy || recoveryBusy || !!recycler?.isProcessing,
+                media.busy || installationBusy || deliveryBusy || recoveryBusy || !!recycler?.isProcessing,
                 () => { void deliver(); }, deliveryMessage || (wallet === "SESSION-PREVIEW" ? "Test mode · No tokens move or rent is recovered." : ""));
             panel.setExpansion(progress.nextLevelEligible, progress.nextLevelUnlocked);
             panel.setRecycler(progress.established, progress.built, progress.recycled.size, progress.nextLevelAccountRequirement);
@@ -161,23 +162,43 @@ export default class Game extends Phaser.Scene {
             panel.setFloors(floors);
             recycler?.refresh();
         };
+        const installRecycler = async (): Promise<void> => {
+            if (disposed || installationBusy || media.busy || deliveryBusy || recoveryBusy || recycler?.isProcessing || selectedLevel !== 0 || !progress.established || progress.built) return;
+            installationBusy = true;
+            deliveryMessage = "Gorweld is installing the Trash Recycler…";
+            // Do not assign yet: retain the plain dumpster beneath the video.
+            const playing = media.play(`install-${phase}.mp4`, true);
+            updateRecycler();
+            const completed = await playing;
+            if (disposed) return;
+            installationBusy = false;
+            if (completed && selectedLevel === 0 && progress.assignTool("trash-recycler")) {
+                deliveryMessage = "Trash Recycler installed. Ready for Trash Delivery.";
+            } else {
+                deliveryMessage = "Installation interrupted. Press Assign to try again.";
+            }
+            updateRecycler(); applyCamera();
+        };
         const panel = new CommandPanel(business, floor => {
-            if (recycler?.isProcessing || media.busy || deliveryBusy || recoveryBusy) return;
+            if (recycler?.isProcessing || media.busy || installationBusy || deliveryBusy || recoveryBusy) return;
             selectedLevel = floor.level === 1 ? 1 : 0;
             zoomFactor = 1; centreX = worldWidth / 2; centreY = worldHeight / 2;
             updateRecycler(); applyCamera();
         }, toolId => {
-            if (recycler?.isProcessing || media.busy || deliveryBusy || recoveryBusy) return;
-            const assigned = selectedLevel === 1 && toolId === "sovereign"
-                ? progress.assignSovereign()
-                : selectedLevel === 0 && toolId === "trash-recycler" && progress.assignTool(toolId);
-            if (assigned) { updateRecycler(); applyCamera(); }
+            if (recycler?.isProcessing || media.busy || installationBusy || deliveryBusy || recoveryBusy) return;
+            if (selectedLevel === 0 && toolId === "trash-recycler") {
+                void installRecycler();
+                return;
+            }
+            if (selectedLevel === 1 && toolId === "sovereign" && progress.assignSovereign()) {
+                updateRecycler(); applyCamera();
+            }
         }, changeView, () => {
-            if (recycler?.isProcessing || media.busy || deliveryBusy || recoveryBusy) return;
+            if (recycler?.isProcessing || media.busy || installationBusy || deliveryBusy || recoveryBusy) return;
             const removed = selectedLevel === 1 ? progress.unassignSovereign() : progress.unassignTool();
             if (removed) updateRecycler();
         }, () => {
-            if (recycler?.isProcessing || media.busy || deliveryBusy || recoveryBusy) return;
+            if (recycler?.isProcessing || media.busy || installationBusy || deliveryBusy || recoveryBusy) return;
             if (progress.simulateNextLevelStake()) updateRecycler();
         });
         const refreshRecovery = async (): Promise<void> => {
@@ -265,7 +286,7 @@ export default class Game extends Phaser.Scene {
         let lastTick = Date.now();
         const clockTimer = window.setInterval(() => {
             const target = nowPhase(); const elapsed = Date.now() - lastTick; lastTick = Date.now();
-            if (document.hidden || disposed || target === phase || media.busy || deliveryBusy || recycler?.isProcessing) return;
+            if (document.hidden || disposed || target === phase || media.busy || installationBusy || deliveryBusy || recycler?.isProcessing) return;
             // On load / after a suspended tab use the correct still immediately.
             if (selectedLevel !== 0 || elapsed > 60000) { phase = target; updateRecycler(); return; }
             const file = `${progress.built ? "recycler" : "bare"}-${target === "night" ? "dusk" : "dawn"}.mp4`;
